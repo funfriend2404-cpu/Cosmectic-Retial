@@ -78,10 +78,14 @@
     body * { visibility: hidden; }
     #receipt-print-area, #receipt-print-area * { visibility: visible; }
     #receipt-print-area {
-      position: fixed; left:0; top:0; width:80mm; padding: 6px 8px;
+      position: absolute; left:0; top:0;
+      width: 100% !important; max-width: 100% !important;
+      padding: 14mm 12mm;
       font-family: 'Courier New', monospace; color:#000;
+      font-size: 15px;
     }
-    @page { size: 80mm auto; margin: 0; }
+    #receipt-print-area img { width: 42mm !important; height: 42mm !important; }
+    @page { size: A5; margin: 0; }
   }
 </style>
 </head>
