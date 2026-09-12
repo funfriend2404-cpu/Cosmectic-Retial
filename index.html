@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
-<title>Makara Cosmetic — Enterprise POS</title>
-<meta name="theme-color" content="#1E181A" />
+<title>Makara Cosmetic — Enterprise POS (Night Mode)</title>
+<meta name="theme-color" content="#120E10" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
 
-<!-- Inline PWA Web Application Manifest -->
-<link rel="manifest" href='data:application/manifest+json,{"name":"Makara Cosmetic POS","short_name":"MakaraPOS","start_url":".","display":"standalone","background_color":"#F8F5F6","theme_color":"#1E181A","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Makara Cosmetic POS","short_name":"MakaraPOS","start_url":".","display":"standalone","background_color":"#120E10","theme_color":"#120E10","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
 
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -21,10 +20,9 @@
   body {
     margin: 0;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #F8F5F6;
-    color: #1E181A;
     -webkit-font-smoothing: antialiased;
     user-select: none;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   .brand-font { font-family: 'Playfair Display', Georgia, serif; }
@@ -33,33 +31,22 @@
 
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #E2D7DA; border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: #C8B8BD; }
+  ::-webkit-scrollbar-thumb { border-radius: 99px; }
 
   .pos-input {
-    border: 1px solid #EDE4E7;
     border-radius: 12px;
     padding: 8px 12px;
     font-size: 13.5px;
-    color: #1E181A;
-    background: #FFFFFF;
     outline: none;
     transition: all 0.18s ease;
-  }
-  .pos-input:focus {
-    border-color: #B85C70;
-    box-shadow: 0 0 0 3.5px rgba(184, 92, 112, 0.15);
   }
   .pos-input-search { padding-left: 36px; }
 
   .pos-btn-primary {
-    background: linear-gradient(135deg, #C76B7F 0%, #B85C70 100%);
-    color: #FFFFFF;
     font-size: 13.5px;
     font-weight: 600;
     padding: 8px 16px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(184, 92, 112, 0.22);
     transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     display: inline-flex;
     align-items: center;
@@ -67,22 +54,13 @@
     border: none;
     cursor: pointer;
   }
-  .pos-btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #B85C70 0%, #A44C60 100%);
-    box-shadow: 0 4px 14px rgba(184, 92, 112, 0.32);
-    transform: translateY(-1px);
-  }
-  .pos-btn-primary:active:not(:disabled) {
-    transform: translateY(0) scale(0.97);
-    box-shadow: 0 1px 4px rgba(184, 92, 112, 0.2);
-  }
+  .pos-btn-primary:active:not(:disabled) { transform: translateY(0) scale(0.97); }
 
   .pos-btn-ghost {
     font-size: 13.5px;
     font-weight: 500;
     padding: 8px 14px;
     border-radius: 12px;
-    color: #635359;
     background: transparent;
     transition: all 0.15s ease;
     display: inline-flex;
@@ -90,45 +68,30 @@
     justify-content: center;
     cursor: pointer;
   }
-  .pos-btn-ghost:hover { background: #F3EAEF; color: #1E181A; }
   .pos-btn-ghost:active { transform: scale(0.96); }
 
   .pos-product-card {
-    background: #FFFFFF;
-    border: 1px solid #EDE4E7;
     border-radius: 16px;
     padding: 12px;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
   }
-  .pos-product-card:not(:disabled):hover {
-    border-color: #D9B4BD;
-    box-shadow: 0 8px 24px rgba(184, 92, 112, 0.14);
-    transform: translateY(-3px) scale(1.01);
-  }
-  .pos-product-card:not(:disabled):active {
-    transform: translateY(0) scale(0.98);
-    box-shadow: 0 2px 8px rgba(184, 92, 112, 0.08);
-  }
+  .pos-product-card:not(:disabled):active { transform: translateY(0) scale(0.98); }
 
   .pos-stepper {
     width: 26px; height: 26px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    border: 1px solid #E2D4D8; color: #8A3D4E; background: #FFFFFF;
     transition: all 0.12s ease; cursor: pointer;
   }
   .pos-stepper:disabled { opacity: 0.35; cursor: not-allowed; }
-  .pos-stepper:not(:disabled):hover { background: #F8EBF0; border-color: #B85C70; }
   .pos-stepper:not(:disabled):active { transform: scale(0.9); }
 
   .pos-stepper-lg {
     width: 36px; height: 36px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    border: 1px solid #E2D4D8; color: #8A3D4E; background: #FFFFFF;
     transition: all 0.12s ease; cursor: pointer;
   }
   .pos-stepper-lg:disabled { opacity: 0.35; cursor: not-allowed; }
-  .pos-stepper-lg:not(:disabled):hover { background: #F8EBF0; border-color: #B85C70; }
   .pos-stepper-lg:not(:disabled):active { transform: scale(0.92); }
 
   .pos-nav-btn { transition: all 0.15s ease; cursor: pointer; }
@@ -139,7 +102,7 @@
   @keyframes pos-modal-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes pos-toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
   @keyframes pos-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
-  @keyframes pos-flash { 0% { background-color: rgba(248, 235, 240, 0.9); } 100% { background-color: transparent; } }
+  @keyframes pos-flash { 0% { opacity: 0.7; } 100% { opacity: 1; } }
 
   .pos-page-anim { animation: pos-fade-in 0.22s ease; }
   .pos-overlay-anim { animation: pos-fade-in 0.18s ease; }
@@ -154,7 +117,7 @@
     #receipt-print-area, #receipt-print-area * { visibility: visible; }
     #receipt-print-area {
       position: absolute; left: 0; top: 0; width: 100% !important;
-      padding: 8mm; font-family: 'Courier New', monospace; color: #000; font-size: 13px;
+      padding: 8mm; font-family: 'Courier New', monospace; color: #000; font-size: 13px; background: #fff !important;
     }
     #receipt-print-area img { width: 34mm !important; height: 34mm !important; }
     @page { size: auto; margin: 0; }
@@ -165,7 +128,6 @@
 <div id="root"></div>
 
 <script>
-// ---------- PWA Service Worker Registration ----------
 if ('serviceWorker' in navigator) {
   const swCode = `
     self.addEventListener('install', e => self.skipWaiting());
@@ -178,7 +140,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
 }
 
-// ---------- Web Audio & Haptic Feedback ----------
 const playPOSSound = (type) => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -216,11 +177,9 @@ const triggerHaptic = (ms = 12) => {
   if ("vibrate" in navigator) navigator.vibrate(ms);
 };
 
-// ---------- Pure JS Canvas Confetti Burst ----------
 function triggerCheckoutConfetti() {
   const canvas = document.createElement("canvas");
-  canvas.style.position = "fixed";
-  canvas.style.top = "0"; canvas.style.left = "0";
+  canvas.style.position = "fixed"; canvas.style.top = "0"; canvas.style.left = "0";
   canvas.style.width = "100vw"; canvas.style.height = "100vh";
   canvas.style.pointerEvents = "none"; canvas.style.zIndex = "99999";
   document.body.appendChild(canvas);
@@ -231,7 +190,7 @@ function triggerCheckoutConfetti() {
     x: canvas.width / 2, y: canvas.height / 2 + 80,
     vx: (Math.random() - 0.5) * 14, vy: Math.random() * -15 - 5,
     size: Math.random() * 7 + 4,
-    color: ["#B85C70", "#D48C9D", "#3B7A57", "#E2D4D8", "#FAD0C4", "#FFD1DC"][Math.floor(Math.random() * 6)],
+    color: ["#B85C70", "#D48C9D", "#3B7A57", "#E2D4D8", "#FFD1DC"][Math.floor(Math.random() * 5)],
     rotation: Math.random() * 360,
   }));
 
@@ -254,7 +213,6 @@ function triggerCheckoutConfetti() {
   loop();
 }
 
-// ---------- Offline-First IndexedDB Engine ----------
 const DB_NAME = "MakaraPOS_DB";
 const DB_VERSION = 1;
 function openDB() {
@@ -295,27 +253,30 @@ async function setDBItem(store, key, val) {
   } catch { return false; }
 }
 
-// Migration from legacy localStorage into IndexedDB
 async function syncLegacyStorage() {
-  const keys = ["products", "sales", "settings", "stockLog"];
-  for (const k of keys) {
+  ["products", "sales", "settings", "stockLog"].forEach(async k => {
     const legacy = localStorage.getItem(`acacia_pos_${k}`);
-    if (legacy) {
-      try {
-        await setDBItem(k, "main", JSON.parse(legacy));
-      } catch (e) {}
-    }
-  }
+    if (legacy) { try { await setDBItem(k, "main", JSON.parse(legacy)); } catch (e) {} }
+  });
 }
 
 const { useState, useEffect, useMemo, useRef } = React;
 const h = React.createElement;
 
-// ---------- Palette ----------
-const C = {
-  bg: "#F8F5F6", panel: "#FFFFFF", ink: "#1E181A", inkDim: "#786A70", border: "#EDE4E7",
-  rose: "#D48C9D", roseDeep: "#B85C70", roseTint: "#F8EBF0",
-  sage: "#3B7A57", sageTint: "#EBF5F0", warn: "#C85A32", warnTint: "#FDF2EE",
+// ---------- Theme Palettes (Default to Dark Mode) ----------
+const THEMES = {
+  dark: {
+    bg: "#120E10", panel: "#1B1517", ink: "#F4EFF1", inkDim: "#A5989D", border: "#2E2428",
+    rose: "#D48C9D", roseDeep: "#D48C9D", roseTint: "#2B1A20",
+    sage: "#4E9A70", sageTint: "#16281F", warn: "#E06D44", warnTint: "#331812",
+    inputBg: "#241D20", shadow: "0 4px 20px rgba(0, 0, 0, 0.4)",
+  },
+  light: {
+    bg: "#F8F5F6", panel: "#FFFFFF", ink: "#1E181A", inkDim: "#786A70", border: "#EDE4E7",
+    rose: "#D48C9D", roseDeep: "#B85C70", roseTint: "#F8EBF0",
+    sage: "#3B7A57", sageTint: "#EBF5F0", warn: "#C85A32", warnTint: "#FDF2EE",
+    inputBg: "#FFFFFF", shadow: "0 2px 8px rgba(184, 92, 112, 0.08)",
+  }
 };
 
 // ---------- SVG Vector Icons ----------
@@ -350,6 +311,8 @@ const IconDown = (p) => h(SvgIcon, { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v
 const IconUp = (p) => h(SvgIcon, { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12", ...p });
 const IconSparkles = (p) => h(SvgIcon, { d: "m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z", ...p });
 const IconCash = (p) => h(SvgIcon, { d: "M2 6h20v12H2zm4 3h.01M18 15h.01M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", ...p });
+const IconSun = (p) => h(SvgIcon, { d: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z", ...p });
+const IconMoon = (p) => h(SvgIcon, { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z", ...p });
 
 // ---------- Translations ----------
 const STRINGS = {
@@ -419,7 +382,7 @@ const STRINGS = {
     deleteConfirmTitle: "លុបទំនិញ", deleteConfirmBody: "វានឹងលុបចេញពីស្តុក។",
     cancel: "បោះបង់", delete: "លុប", editProduct: "កែសម្រួល", uploadPhoto: "ផ្ទុករូបភាព",
     jpgPng: "JPG ឬ PNG", removePhoto: "លុបរូបភាព", fieldName: "ឈ្មោះទំនិញ",
-    namePlaceholder: "ឧ. ក្រែមលាបមាត់ #302", fieldSku: "SKU", skuPlaceholder: "ស្វ័យប្រវត្តិបើទុកទទេ",
+    namePlaceholder: "ឧ. ក្រែមលាបមាត់ #302", fieldSku: "SKU", skuPlaceholder: "ស្វ័យប្រវត្តិក៏ទុកទទេ",
     fieldQty: "បរិមាណ", fieldCost: "ថ្លៃដើម ($)", fieldPrice: "តម្លៃលក់ ($)", marginLabel: "ចំណេញ", profitPerUnit: "ចំណេញ/ឯកតា",
     saveChanges: "រក្សាទុក",
     reportsTitle: "របាយការណ៍", reportsSubtitle: "ចំណូល និងប្រាក់ចំណេញ", day: "ថ្ងៃ", week: "សប្តាហ៍", month: "ខែ",
@@ -444,17 +407,17 @@ const STRINGS = {
 };
 
 const LangContext = React.createContext("en");
+const ThemeContext = React.createContext("dark");
+
 function useT() {
   const lang = React.useContext(LangContext);
   return (key) => (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
 }
 
-// ---------- Currency Format Helpers ----------
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const clampQty = (n) => Math.max(0, Math.floor(Number(n) || 0));
-
 const moneyUSD = (n) => `$${(Number(n) || 0).toFixed(2)}`;
 const moneyKHR = (usd, rate = 4100) => `៛${(Math.round(((Number(usd) || 0) * rate) / 100) * 100).toLocaleString()}`;
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const clampQty = (n) => Math.max(0, Math.floor(Number(n) || 0));
 
 function dayKey(ts) { return new Date(ts).toISOString().slice(0, 10); }
 function weekKey(ts) {
@@ -491,7 +454,6 @@ function compressImage(file, maxWidth = 420, quality = 0.75) {
   });
 }
 
-// ---------- Smooth Animated Numeric Display ----------
 function AnimatedNumber({ value, formatter = moneyUSD, rate = 4100 }) {
   const [displayVal, setDisplayVal] = useState(value);
   useEffect(() => {
@@ -506,20 +468,22 @@ function AnimatedNumber({ value, formatter = moneyUSD, rate = 4100 }) {
     };
     requestAnimationFrame(step);
   }, [value]);
-
   return h("span", { className: "tabular-nums" }, formatter(displayVal, rate));
 }
 
-// ---------- Shared UI Components ----------
 function Toast({ message }) {
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   if (!message) return null;
   return h("div", {
     className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 z-50 pos-toast-anim border border-white/10",
-    style: { background: C.ink, color: "#fff" }
+    style: { background: theme === "dark" ? "#F4EFF1" : C.ink, color: theme === "dark" ? "#120E10" : "#fff" }
   }, h(IconCheck, { size: 15, color: C.rose }), h("span", { className: "text-xs font-semibold tracking-wide" }, message));
 }
 
 function EmptyState({ icon, title, body, action }) {
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   return h("div", { className: "flex flex-col items-center justify-center text-center py-16 px-6" },
     h("div", { className: "w-14 h-14 rounded-2xl flex items-center justify-center mb-3 shadow-inner", style: { background: C.roseTint, color: C.roseDeep } },
       h(icon, { size: 26 })),
@@ -530,58 +494,50 @@ function EmptyState({ icon, title, body, action }) {
 }
 
 function Field({ label, children }) {
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   return h("label", { className: "block" },
     h("span", { className: "block text-xs font-semibold tracking-wider uppercase mb-1.5 opacity-80", style: { color: C.inkDim } }, label),
     children);
 }
 
 function SheetShell({ onClose, maxWidth = "max-w-md", children }) {
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   return h("div", {
     className: "fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 pos-overlay-anim backdrop-blur-sm",
-    style: { background: "rgba(30,24,26,0.5)" }, onClick: onClose
+    style: { background: "rgba(0,0,0,0.6)" }, onClick: onClose
   },
     h("div", {
-      className: `w-full ${maxWidth} md:rounded-2xl rounded-t-2xl shadow-2xl overflow-hidden flex flex-col pos-modal-anim border border-white/40`,
-      style: { background: C.panel, maxHeight: "92vh" },
+      className: `w-full ${maxWidth} md:rounded-2xl rounded-t-2xl shadow-2xl overflow-hidden flex flex-col pos-modal-anim border`,
+      style: { background: C.panel, borderColor: C.border, maxHeight: "92vh", color: C.ink },
       onClick: (e) => e.stopPropagation()
     }, children)
   );
 }
 
-// ---------- Payment Modal (Cashier Breakdown) ----------
 function PaymentModal({ totalUSD, exchangeRate, onClose, onConfirm }) {
   const t = useT();
-  const [payMethod, setPayMethod] = useState("cash"); // cash | khqr | card
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
+  const [payMethod, setPayMethod] = useState("cash");
   const [tenderedUSD, setTenderedUSD] = useState(totalUSD);
-  const totalKHR = Math.round((totalUSD * exchangeRate) / 100) * 100;
   const changeUSD = Math.max(0, (Number(tenderedUSD) || 0) - totalUSD);
-  const changeKHR = Math.round((changeUSD * exchangeRate) / 100) * 100;
 
   const submit = () => {
-    triggerHaptic(20);
-    playPOSSound("success");
-    triggerCheckoutConfetti();
-    onConfirm({
-      paymentMethod: payMethod,
-      tenderedUSD: Number(tenderedUSD) || totalUSD,
-      changeUSD,
-      changeKHR
-    });
+    triggerHaptic(20); playPOSSound("success"); triggerCheckoutConfetti();
+    onConfirm({ paymentMethod: payMethod, tenderedUSD: Number(tenderedUSD) || totalUSD, changeUSD });
   };
 
   return h(SheetShell, { onClose, maxWidth: "max-w-md" },
     h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}`, background: C.roseTint } },
       h("h2", { className: "font-semibold text-base flex items-center gap-2", style: { color: C.ink } }, h(IconCash, { size: 18, color: C.roseDeep }), t("checkout")),
-      h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+      h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
     h("div", { className: "px-6 py-5 space-y-4 overflow-y-auto flex-1" },
-      
-      // Total Amount Banner (Dual Currency)
-      h("div", { className: "p-4 rounded-2xl text-center shadow-sm border border-gray-100", style: { background: C.bg } },
+      h("div", { className: "p-4 rounded-2xl text-center shadow-sm border", style: { background: C.bg, borderColor: C.border } },
         h("div", { className: "text-xs font-bold uppercase tracking-wider mb-1", style: { color: C.inkDim } }, t("total")),
         h("div", { className: "text-3xl font-black tabular-nums", style: { color: C.roseDeep } }, moneyUSD(totalUSD)),
         h("div", { className: "text-sm font-semibold tabular-nums mt-0.5", style: { color: C.sage } }, moneyKHR(totalUSD, exchangeRate))),
-
-      // Payment Method Options
       h(Field, { label: t("payMethod") },
         h("div", { className: "grid grid-cols-3 gap-2 mt-1" },
           [
@@ -592,34 +548,34 @@ function PaymentModal({ totalUSD, exchangeRate, onClose, onConfirm }) {
             key: m.id, onClick: () => { setPayMethod(m.id); triggerHaptic(8); playPOSSound("add"); },
             className: "py-3 px-2 rounded-xl flex flex-col items-center gap-1.5 text-xs font-bold transition border",
             style: {
-              background: payMethod === m.id ? C.roseTint : "#fff",
+              background: payMethod === m.id ? C.roseTint : C.inputBg,
               borderColor: payMethod === m.id ? C.roseDeep : C.border,
               color: payMethod === m.id ? C.roseDeep : C.inkDim
             }
           }, h(m.icon, { size: 18 }), m.label)))),
-
-      // Cash Calculator Section
-      payMethod === "cash" ? h("div", { className: "p-4 rounded-2xl border border-gray-200 space-y-3", style: { background: "#fff" } },
+      payMethod === "cash" ? h("div", { className: "p-4 rounded-2xl border space-y-3", style: { background: C.panel, borderColor: C.border } },
         h(Field, { label: t("amountTendered") + " ($)" },
           h("input", {
             type: "number", min: "0", step: "0.01", className: "pos-input w-full text-lg font-bold tabular-nums",
+            style: { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` },
             value: tenderedUSD, onChange: (e) => setTenderedUSD(e.target.value)
           })),
-        h("div", { className: "flex justify-between items-center text-xs pt-2 border-t border-gray-100" },
+        h("div", { className: "flex justify-between items-center text-xs pt-2 border-t", style: { borderColor: C.border } },
           h("span", { className: "font-semibold", style: { color: C.inkDim } }, t("changeDue")),
           h("div", { className: "text-right" },
             h("div", { className: "text-base font-bold tabular-nums", style: { color: C.sage } }, moneyUSD(changeUSD)),
             h("div", { className: "text-xs font-medium tabular-nums", style: { color: C.inkDim } }, moneyKHR(changeUSD, exchangeRate))))) : null
     ),
     h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
-      h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("cancel")),
-      h("button", { onClick: submit, className: "pos-btn-primary py-3 px-6 text-sm font-bold shadow-lg" }, t("confirmPayment")))
+      h("button", { onClick: onClose, className: "pos-btn-ghost", style: { color: C.inkDim } }, t("cancel")),
+      h("button", { onClick: submit, className: "pos-btn-primary py-3 px-6 text-sm font-bold shadow-lg", style: { background: C.roseDeep, color: "#fff" } }, t("confirmPayment")))
   );
 }
 
-// ---------- Product Modal ----------
 function ProductModal({ initial, onClose, onSave }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const [name, setName] = useState(initial ? initial.name : "");
   const [sku, setSku] = useState(initial ? initial.sku : "");
   const [type, setType] = useState(initial ? initial.type || "" : "");
@@ -649,69 +605,86 @@ function ProductModal({ initial, onClose, onSave }) {
     });
   };
 
+  const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
+
   return h(SheetShell, { onClose },
       h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
         h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, initial ? t("editProduct") : t("addProduct")),
-        h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+        h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
       h("div", { className: "px-6 py-5 space-y-4 flex-1 overflow-y-auto" },
-        h("div", { className: "flex items-center gap-4 p-3 rounded-2xl", style: { background: C.roseTint } },
+        h("div", { className: "flex items-center gap-4 p-3 rounded-2xl border", style: { background: C.roseTint, borderColor: C.border } },
           h("button", {
             onClick: () => fileRef.current && fileRef.current.click(),
             className: "w-20 h-20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-sm transition hover:opacity-90",
-            style: { background: "#fff", border: `1.5px dashed ${C.rose}` }
+            style: { background: C.panel, border: `1.5px dashed ${C.rose}` }
           }, busy ? "..." : photo ? h("img", { src: photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 24, color: C.roseDeep })),
           h("div", { className: "text-xs", style: { color: C.inkDim } },
             h("button", { onClick: () => fileRef.current && fileRef.current.click(), className: "font-semibold underline block", style: { color: C.roseDeep } }, t("uploadPhoto")),
             h("div", { className: "mt-0.5 text-[11px]" }, t("jpgPng")),
             photo ? h("button", { onClick: () => setPhoto(""), className: "mt-2 font-medium underline block", style: { color: C.warn } }, t("removePhoto")) : null),
           h("input", { ref: fileRef, type: "file", accept: "image/*", className: "hidden", onChange: handleFile })),
-        h(Field, { label: t("fieldName") }, h("input", { className: "pos-input w-full", value: name, onChange: (e) => setName(e.target.value), placeholder: t("namePlaceholder") })),
-        h(Field, { label: t("fieldSku") }, h("input", { className: "pos-input w-full", value: sku, onChange: (e) => setSku(e.target.value), placeholder: t("skuPlaceholder") })),
-        h(Field, { label: t("fieldType") }, h("input", { className: "pos-input w-full", value: type, onChange: (e) => setType(e.target.value), placeholder: t("typePlaceholder") })),
+        h(Field, { label: t("fieldName") }, h("input", { className: "pos-input w-full", style: inputStyle, value: name, onChange: (e) => setName(e.target.value), placeholder: t("namePlaceholder") })),
+        h(Field, { label: t("fieldSku") }, h("input", { className: "pos-input w-full", style: inputStyle, value: sku, onChange: (e) => setSku(e.target.value), placeholder: t("skuPlaceholder") })),
+        h(Field, { label: t("fieldType") }, h("input", { className: "pos-input w-full", style: inputStyle, value: type, onChange: (e) => setType(e.target.value), placeholder: t("typePlaceholder") })),
         h("div", { className: "grid grid-cols-3 gap-3" },
-          h(Field, { label: t("fieldQty") }, h("input", { type: "number", min: "0", step: "1", className: "pos-input w-full", value: qty, onChange: (e) => setQty(e.target.value) })),
-          h(Field, { label: t("fieldCost") }, h("input", { type: "number", min: "0", step: "0.01", className: "pos-input w-full", value: cost, onChange: (e) => setCost(e.target.value), placeholder: "0.00" })),
-          h(Field, { label: t("fieldPrice") }, h("input", { type: "number", min: "0", step: "0.01", className: "pos-input w-full", value: price, onChange: (e) => setPrice(e.target.value), placeholder: "0.00" }))),
+          h(Field, { label: t("fieldQty") }, h("input", { type: "number", min: "0", step: "1", className: "pos-input w-full", style: inputStyle, value: qty, onChange: (e) => setQty(e.target.value) })),
+          h(Field, { label: t("fieldCost") }, h("input", { type: "number", min: "0", step: "0.01", className: "pos-input w-full", style: inputStyle, value: cost, onChange: (e) => setCost(e.target.value), placeholder: "0.00" })),
+          h(Field, { label: t("fieldPrice") }, h("input", { type: "number", min: "0", step: "0.01", className: "pos-input w-full", style: inputStyle, value: price, onChange: (e) => setPrice(e.target.value), placeholder: "0.00" }))),
         (cost !== "" && price !== "" && Number(price) > 0) ? h("div", {
           className: "text-xs px-3.5 py-2.5 rounded-xl font-medium flex items-center justify-between shadow-sm", style: { background: C.sageTint, color: C.sage }
         }, h("span", null, `${t("marginLabel")}: ${(((Number(price) - Number(cost)) / Number(price)) * 100).toFixed(0)}%`), h("span", { className: "font-semibold" }, `${t("profitPerUnit")}: ${moneyUSD(Number(price) - Number(cost))}`)) : null
       ),
       h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
-        h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("cancel")),
-        h("button", { onClick: submit, disabled: !canSave, className: "pos-btn-primary", style: { opacity: canSave ? 1 : 0.4 } }, initial ? t("saveChanges") : t("addProduct")))
+        h("button", { onClick: onClose, className: "pos-btn-ghost", style: { color: C.inkDim } }, t("cancel")),
+        h("button", { onClick: submit, disabled: !canSave, className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff", opacity: canSave ? 1 : 0.4 } }, initial ? t("saveChanges") : t("addProduct")))
   );
 }
 
-// ---------- Stock Adjust Modal ----------
 function StockAdjustModal({ product, onClose, onApply }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const [delta, setDelta] = useState(0);
   const [reason, setReason] = useState("");
   const resultQty = clampQty(product.qty + delta);
+
   return h(SheetShell, { onClose, maxWidth: "max-w-sm" },
     h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
       h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("stockAdjustTitle")),
-      h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+      h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
     h("div", { className: "px-6 py-5 space-y-4" },
       h("div", { className: "text-sm font-semibold", style: { color: C.ink } }, product.name),
       h("div", { className: "flex items-center justify-center gap-5 py-2" },
-        h("button", { onClick: () => { setDelta(d => d - 1); triggerHaptic(8); playPOSSound("add"); }, className: "pos-stepper-lg" }, h(IconMinus, { size: 16 })),
+        h("button", {
+          onClick: () => { setDelta(d => d - 1); triggerHaptic(8); playPOSSound("add"); },
+          className: "pos-stepper-lg", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep }
+        }, h(IconMinus, { size: 16 })),
         h("div", { className: "text-center min-w-[90px]" },
           h("div", { className: "text-3xl font-bold tabular-nums", style: { color: C.roseDeep } }, (delta > 0 ? "+" : "") + delta),
           h("div", { className: "text-xs font-medium tabular-nums mt-0.5", style: { color: C.inkDim } }, `${product.qty} → ${resultQty}`)),
-        h("button", { onClick: () => { setDelta(d => d + 1); triggerHaptic(8); playPOSSound("add"); }, className: "pos-stepper-lg" }, h(IconPlus, { size: 16 }))),
+        h("button", {
+          onClick: () => { setDelta(d => d + 1); triggerHaptic(8); playPOSSound("add"); },
+          className: "pos-stepper-lg", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep }
+        }, h(IconPlus, { size: 16 }))),
       h(Field, { label: t("stockAdjustReason") },
-        h("input", { className: "pos-input w-full", value: reason, onChange: (e) => setReason(e.target.value), placeholder: t("stockAdjustReasonPlaceholder") }))
+        h("input", {
+          className: "pos-input w-full", style: { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` },
+          value: reason, onChange: (e) => setReason(e.target.value), placeholder: t("stockAdjustReasonPlaceholder")
+        }))
     ),
     h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
-      h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("cancel")),
-      h("button", { onClick: () => onApply(delta, reason), disabled: delta === 0, className: "pos-btn-primary", style: { opacity: delta === 0 ? 0.4 : 1 } }, t("applyAdjustment")))
+      h("button", { onClick: onClose, className: "pos-btn-ghost", style: { color: C.inkDim } }, t("cancel")),
+      h("button", {
+        onClick: () => onApply(delta, reason), disabled: delta === 0,
+        className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff", opacity: delta === 0 ? 0.4 : 1 }
+      }, t("applyAdjustment")))
   );
 }
 
-// ---------- Inventory Page ----------
 function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdjustStock, lowStockThreshold, onImportProducts }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [modal, setModal] = useState(null);
@@ -748,6 +721,8 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
     e.target.value = "";
   };
 
+  const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
+
   return h("div", { className: "flex flex-col h-full pos-page-anim max-w-7xl mx-auto w-full" },
     h("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 pt-5 pb-4" },
       h("div", null,
@@ -755,24 +730,24 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
         h("p", { className: "text-xs font-medium", style: { color: C.inkDim } }, `${products.length} ${products.length === 1 ? t("productsOnFile") : t("productsOnFilePl")}`)),
       h("div", { className: "flex flex-wrap items-center gap-2" },
         h("div", { className: "relative flex-1 sm:flex-none" },
-          h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" }, h(IconSearch, { size: 14 })),
-          h("input", { value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchNameSku"), className: "pos-input pos-input-search w-full sm:w-60 shadow-sm" })),
-        h("button", { onClick: exportExcel, className: "pos-btn-ghost flex items-center gap-1.5 shadow-sm border border-gray-200" }, h(IconSheet, { size: 14, color: C.sage }), h("span", { className: "hidden xs:inline" }, t("exportExcel"))),
-        h("button", { onClick: () => importRef.current && importRef.current.click(), className: "pos-btn-ghost flex items-center gap-1.5 shadow-sm border border-gray-200" }, h(IconUp, { size: 14, color: C.roseDeep }), h("span", { className: "hidden xs:inline" }, t("importExcel"))),
+          h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 opacity-60" }, h(IconSearch, { size: 14 })),
+          h("input", { value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchNameSku"), className: "pos-input pos-input-search w-full sm:w-60 shadow-sm", style: inputStyle })),
+        h("button", { onClick: exportExcel, className: "pos-btn-ghost flex items-center gap-1.5 shadow-sm border", style: { borderColor: C.border, color: C.ink } }, h(IconSheet, { size: 14, color: C.sage }), h("span", { className: "hidden xs:inline" }, t("exportExcel"))),
+        h("button", { onClick: () => importRef.current && importRef.current.click(), className: "pos-btn-ghost flex items-center gap-1.5 shadow-sm border", style: { borderColor: C.border, color: C.ink } }, h(IconUp, { size: 14, color: C.roseDeep }), h("span", { className: "hidden xs:inline" }, t("importExcel"))),
         h("input", { ref: importRef, type: "file", accept: ".xlsx,.xls,.csv", className: "hidden", onChange: handleImportFile }),
-        h("button", { onClick: () => setModal("new"), className: "pos-btn-primary flex items-center gap-1.5" }, h(IconPlus, { size: 14 }), h("span", { className: "hidden xs:inline" }, t("addProduct"))))),
+        h("button", { onClick: () => setModal("new"), className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff" } }, h(IconPlus, { size: 14, className: "mr-1.5" }), h("span", { className: "hidden xs:inline" }, t("addProduct"))))),
     types.length > 0 ? h("div", { className: "px-4 sm:px-6 pb-3" },
-      h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full sm:w-56" },
+      h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full sm:w-56", style: inputStyle },
         h("option", { value: "" }, t("filterAllTypes")),
         types.map(ty => h("option", { key: ty, value: ty }, ty)))
     ) : null,
     h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6 pb-6" },
       products.length === 0 ? h(EmptyState, {
         icon: IconBox, title: t("noProductsTitle"), body: t("noProductsBody"),
-        action: h("button", { onClick: () => setModal("new"), className: "pos-btn-primary flex items-center gap-1.5" }, h(IconPlus, { size: 14 }), t("addProduct"))
+        action: h("button", { onClick: () => setModal("new"), className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff" } }, h(IconPlus, { size: 14, className: "mr-1.5" }), t("addProduct"))
       }) : filtered.length === 0 ? h("p", { className: "text-sm text-center py-12 font-medium", style: { color: C.inkDim } }, `${t("noMatch")} "${query}".`)
       : h(React.Fragment, null,
-          h("div", { className: "hidden md:block rounded-2xl overflow-hidden shadow-sm border border-gray-200", style: { background: C.panel } },
+          h("div", { className: "hidden md:block rounded-2xl overflow-hidden shadow-sm border", style: { background: C.panel, borderColor: C.border } },
             h("table", { className: "w-full text-sm" },
               h("thead", null, h("tr", { style: { background: C.roseTint } },
                 h("th", { className: "text-left px-4 py-3" }),
@@ -786,8 +761,8 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
               h("tbody", null, filtered.map((p, i) => {
                 const margin = p.price > 0 ? ((p.price - p.cost) / p.price) * 100 : 0;
                 const low = p.qty > 0 && p.qty <= lowStockThreshold;
-                return h("tr", { key: p.id, className: "hover:bg-pink-50/20 transition-colors", style: { borderTop: i === 0 ? "none" : `1px solid ${C.border}` } },
-                  h("td", { className: "px-4 py-3" }, h("div", { className: "w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100", style: { background: C.bg } }, p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 16, color: C.inkDim }))),
+                return h("tr", { key: p.id, className: "transition-colors", style: { borderTop: i === 0 ? "none" : `1px solid ${C.border}` } },
+                  h("td", { className: "px-4 py-3" }, h("div", { className: "w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border", style: { background: C.inputBg, borderColor: C.border } }, p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 16, color: C.inkDim }))),
                   h("td", { className: "px-3 py-3 font-semibold", style: { color: C.ink } }, p.name),
                   h("td", { className: "px-3 py-3 font-mono text-xs", style: { color: C.inkDim } }, p.sku),
                   h("td", { className: "px-3 py-3 text-right tabular-nums" }, p.qty === 0 ? h("span", { className: "px-2 py-0.5 rounded-full text-xs font-semibold", style: { background: C.warnTint, color: C.warn } }, t("out")) : low ? h("span", { className: "font-semibold px-2 py-0.5 rounded-full text-xs", style: { background: C.warnTint, color: C.warn } }, p.qty) : h("span", { className: "font-medium", style: { color: C.ink } }, p.qty)),
@@ -795,11 +770,11 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
                   h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.ink } }, moneyUSD(p.price)),
                   h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.sage } }, margin.toFixed(0) + "%"),
                   h("td", { className: "px-4 py-3" }, h("div", { className: "flex items-center justify-end gap-1.5" },
-                    h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper" }, h(IconMinus, { size: 12 })),
-                    h("button", { onClick: () => setAdjustTarget(p), className: "p-1.5 rounded-lg text-gray-500 hover:bg-gray-100" }, h(IconBox, { size: 14 })),
-                    h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper" }, h(IconPlus, { size: 12 })),
-                    h("button", { onClick: () => setModal(p), className: "p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 ml-1" }, h(IconPencil, { size: 14 })),
-                    h("button", { onClick: () => setConfirmDelete(p), className: "p-1.5 rounded-lg text-rose-500 hover:bg-rose-50" }, h(IconTrash, { size: 14 })))));
+                    h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconMinus, { size: 12 })),
+                    h("button", { onClick: () => setAdjustTarget(p), className: "p-1.5 rounded-lg opacity-70 hover:opacity-100" }, h(IconBox, { size: 14 })),
+                    h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 12 })),
+                    h("button", { onClick: () => setModal(p), className: "p-1.5 rounded-lg opacity-70 hover:opacity-100 ml-1" }, h(IconPencil, { size: 14 })),
+                    h("button", { onClick: () => setConfirmDelete(p), className: "p-1.5 rounded-lg text-rose-500 hover:bg-rose-50/10" }, h(IconTrash, { size: 14 })))));
               }))))
         )),
     modal ? h(ProductModal, { initial: modal === "new" ? null : modal, onClose: () => setModal(null), onSave: (p) => { modal === "new" ? onAdd(p) : onEdit(p); setModal(null); } }) : null,
@@ -809,37 +784,40 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
         h("h3", { className: "font-semibold text-base mb-1", style: { color: C.ink } }, `${t("deleteConfirmTitle")} "${confirmDelete.name}"?`),
         h("p", { className: "text-xs mb-5 leading-relaxed", style: { color: C.inkDim } }, t("deleteConfirmBody")),
         h("div", { className: "flex justify-end gap-2" },
-          h("button", { onClick: () => setConfirmDelete(null), className: "pos-btn-ghost" }, t("cancel")),
+          h("button", { onClick: () => setConfirmDelete(null), className: "pos-btn-ghost", style: { color: C.inkDim } }, t("cancel")),
           h("button", { onClick: () => { onDelete(confirmDelete.id); setConfirmDelete(null); }, className: "pos-btn-primary", style: { background: C.warn, color: "#fff" } }, t("delete"))))) : null
   );
 }
 
-// ---------- Cart Contents ----------
 function CartContents({ cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout, flashId }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
+  const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
+
   return h(React.Fragment, null,
     cart.length > 0 ? h("div", { className: "shrink-0 flex items-center text-[11px] font-bold tracking-wider uppercase pb-2.5 mb-2", style: { color: C.inkDim, borderBottom: `1px solid ${C.border}` } },
       h("span", { className: "w-6" }), h("span", { className: "flex-1" }, t("colName")), h("span", { className: "w-20 text-center" }, t("colQty")), h("span", { className: "w-16 text-right" }, t("colPrice"))) : null,
     h("div", { className: "flex-1 overflow-y-auto" },
       cart.length === 0 ? h(EmptyState, { icon: IconCart, title: t("cartEmpty"), body: "" })
       : h("div", { className: "space-y-2.5 pr-1" }, cart.map(item => h("div", { key: item.id, className: "flex items-center gap-2 rounded-xl p-2 transition-colors" + (flashId === item.id ? " pos-row-flash" : "") },
-          h("button", { onClick: () => removeItem(item.id), className: "w-6 shrink-0 flex items-center justify-center text-gray-400 hover:text-rose-600" }, h(IconTrash, { size: 14 })),
+          h("button", { onClick: () => removeItem(item.id), className: "w-6 shrink-0 flex items-center justify-center opacity-60 hover:text-rose-500" }, h(IconTrash, { size: 14 })),
           h("div", { className: "flex-1 min-w-0" },
             h("div", { className: "text-xs font-semibold truncate", style: { color: C.ink } }, item.name),
             h("div", { className: "text-[11px] tabular-nums", style: { color: C.inkDim } }, `${moneyUSD(item.price)} ${t("each")}`)),
           h("div", { className: "w-20 flex items-center justify-center gap-1 shrink-0" },
-            h("button", { onClick: () => changeQty(item.id, -1), className: "pos-stepper" }, h(IconMinus, { size: 10 })),
+            h("button", { onClick: () => changeQty(item.id, -1), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconMinus, { size: 10 })),
             h("span", { className: "w-5 text-center text-xs font-semibold tabular-nums", style: { color: C.ink } }, item.qty),
-            h("button", { onClick: () => changeQty(item.id, 1), disabled: item.qty >= item.stock, className: "pos-stepper" }, h(IconPlus, { size: 10 }))),
+            h("button", { onClick: () => changeQty(item.id, 1), disabled: item.qty >= item.stock, className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 10 }))),
           h("div", { className: "w-16 text-right text-xs font-semibold tabular-nums shrink-0", style: { color: C.ink } }, moneyUSD(item.price * item.qty))
         )))),
     h("div", { className: "shrink-0 space-y-3 pt-3 mt-auto", style: { borderTop: `1px solid ${C.border}` } },
       h("div", { className: "flex items-center gap-2" },
         h("span", { className: "text-xs font-semibold shrink-0", style: { color: C.inkDim } }, t("discount")),
-        h("div", { className: "flex rounded-xl overflow-hidden shrink-0 border border-gray-200" },
-          h("button", { onClick: () => setDiscountType("percent"), className: "px-2.5 py-1 text-xs font-bold", style: { background: discountType === "percent" ? C.roseTint : "transparent", color: discountType === "percent" ? C.roseDeep : C.inkDim } }, h(IconPercent, { size: 12 })),
-          h("button", { onClick: () => setDiscountType("fixed"), className: "px-2.5 py-1 text-xs font-bold border-l border-gray-200", style: { background: discountType === "fixed" ? C.roseTint : "transparent", color: discountType === "fixed" ? C.roseDeep : C.inkDim } }, h(IconDollar, { size: 12 }))),
-        h("input", { type: "number", min: "0", step: "0.01", inputMode: "decimal", value: discountValue, onChange: (e) => setDiscountValue(e.target.value), className: "pos-input flex-1 text-right py-1.5 text-xs font-medium", placeholder: "0" })),
+        h("div", { className: "flex rounded-xl overflow-hidden shrink-0 border", style: { borderColor: C.border } },
+          h("button", { onClick: () => setDiscountType("percent"), className: "px-2.5 py-1 text-xs font-bold", style: { background: discountType === "percent" ? C.roseTint : C.inputBg, color: discountType === "percent" ? C.roseDeep : C.inkDim } }, h(IconPercent, { size: 12 })),
+          h("button", { onClick: () => setDiscountType("fixed"), className: "px-2.5 py-1 text-xs font-bold border-l", style: { borderColor: C.border, background: discountType === "fixed" ? C.roseTint : C.inputBg, color: discountType === "fixed" ? C.roseDeep : C.inkDim } }, h(IconDollar, { size: 12 }))),
+        h("input", { type: "number", min: "0", step: "0.01", inputMode: "decimal", value: discountValue, onChange: (e) => setDiscountValue(e.target.value), className: "pos-input flex-1 text-right py-1.5 text-xs font-medium", style: inputStyle, placeholder: "0" })),
       h("div", { className: "space-y-1.5" },
         h("div", { className: "flex justify-between text-xs tabular-nums" }, h("span", { style: { color: C.inkDim } }, t("subtotal")), h("span", { className: "font-medium", style: { color: C.ink } }, moneyUSD(subtotal))),
         h("div", { className: "flex justify-between text-xs tabular-nums" }, h("span", { style: { color: C.inkDim } }, t("discount")), h("span", { className: "font-medium", style: { color: discountAmount > 0 ? C.warn : C.inkDim } }, discountAmount > 0 ? "-" + moneyUSD(discountAmount) : moneyUSD(0))),
@@ -849,14 +827,15 @@ function CartContents({ cart, changeQty, removeItem, discountType, setDiscountTy
             h("div", { className: "text-lg font-black", style: { color: C.roseDeep } }, h(AnimatedNumber, { value: total, formatter: moneyUSD })),
             h("div", { className: "text-xs font-semibold", style: { color: C.sage } }, h(AnimatedNumber, { value: total, formatter: moneyKHR, rate: exchangeRate }))))),
       h("div", { className: "flex gap-2 pt-1" },
-        h("button", { onClick: () => cart.forEach(i => removeItem(i.id)), disabled: cart.length === 0, className: "pos-btn-ghost shrink-0 border border-gray-200", style: { opacity: cart.length === 0 ? 0.4 : 1 } }, t("clear")),
-        h("button", { onClick: onOpenCheckout, disabled: cart.length === 0, className: "pos-btn-primary flex-1 py-3 text-sm flex items-center justify-center gap-2 shadow-lg", style: { opacity: cart.length === 0 ? 0.4 : 1 } }, h("span", null, t("completeSale")), h(IconChevron, { size: 16 }))))
+        h("button", { onClick: () => cart.forEach(i => removeItem(i.id)), disabled: cart.length === 0, className: "pos-btn-ghost shrink-0 border", style: { borderColor: C.border, color: C.inkDim, opacity: cart.length === 0 ? 0.4 : 1 } }, t("clear")),
+        h("button", { onClick: onOpenCheckout, disabled: cart.length === 0, className: "pos-btn-primary flex-1 py-3 text-sm flex items-center justify-center gap-2 shadow-lg", style: { background: C.roseDeep, color: "#fff", opacity: cart.length === 0 ? 0.4 : 1 } }, h("span", null, t("completeSale")), h(IconChevron, { size: 16 }))))
   );
 }
 
-// ---------- Sales Page ----------
 function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddProduct }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const [query, setQuery] = useState("");
   const [discountType, setDiscountType] = useState("percent");
   const [discountValue, setDiscountValue] = useState(0);
@@ -903,20 +882,21 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   };
 
   const cartProps = { cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout: () => setPaymentModalOpen(true), flashId };
+  const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
 
   return h("div", { className: "flex flex-col md:flex-row h-full pos-page-anim max-w-7xl mx-auto w-full" },
     h("div", { className: "flex-1 flex flex-col min-w-0" },
       h("div", { className: "px-4 sm:px-6 pt-5 pb-4" },
         h("div", { className: "hidden md:flex items-center justify-between mb-4" },
           h("h1", { className: "text-xl font-bold tracking-tight", style: { color: C.ink } }, t("salesTitle")),
-          h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border border-gray-200" }, h(IconPlus, { size: 14, color: C.roseDeep }), t("addNewItem"))),
+          h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border", style: { borderColor: C.border, color: C.ink } }, h(IconPlus, { size: 14, color: C.roseDeep }), t("addNewItem"))),
         h("div", { className: "flex items-center gap-2" },
           h("div", { className: "relative flex-1" },
-            h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" }, h(IconSearch, { size: 14 })),
-            h("input", { id: "pos-search-input", value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchProducts"), className: "pos-input pos-input-search w-full max-w-sm shadow-sm" })),
-          h("button", { onClick: () => setQuickAdd(true), className: "md:hidden p-2.5 rounded-xl shrink-0 border border-gray-200 shadow-sm", style: { background: C.roseTint, color: C.roseDeep } }, h(IconPlus, { size: 16 }))),
+            h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 opacity-60" }, h(IconSearch, { size: 14 })),
+            h("input", { id: "pos-search-input", value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchProducts"), className: "pos-input pos-input-search w-full max-w-sm shadow-sm", style: inputStyle })),
+          h("button", { onClick: () => setQuickAdd(true), className: "md:hidden p-2.5 rounded-xl shrink-0 border shadow-sm", style: { background: C.roseTint, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 16 }))),
         types.length > 0 ? h("div", { className: "mt-2.5" },
-          h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full max-w-sm" },
+          h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full max-w-sm", style: inputStyle },
             h("option", { value: "" }, t("filterAllTypes")),
             types.map(ty => h("option", { key: ty, value: ty }, ty)))
         ) : null),
@@ -928,9 +908,11 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
               return h("div", { key: p.id, className: "pos-card-anim" },
                 h("button", {
                   onClick: () => addToCart(p),
-                  disabled: p.qty <= 0, className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between relative overflow-hidden", style: { opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
+                  disabled: p.qty <= 0,
+                  className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between relative overflow-hidden border",
+                  style: { background: C.panel, borderColor: C.border, opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
                 },
-                  h("div", { className: "w-full aspect-square rounded-xl overflow-hidden mb-2.5 flex items-center justify-center relative border border-gray-100", style: { background: C.bg } },
+                  h("div", { className: "w-full aspect-square rounded-xl overflow-hidden mb-2.5 flex items-center justify-center relative border", style: { background: C.inputBg, borderColor: C.border } },
                     p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 22, color: C.inkDim }),
                     inCart > 0 ? h("span", {
                       className: "absolute top-2 right-2 min-w-[22px] h-5 px-1.5 rounded-full flex items-center justify-center text-xs font-bold shadow-md" + (cartPulse ? " pos-cart-pulse" : ""),
@@ -944,15 +926,13 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
             }))
       )),
 
-    // Desktop Cart Panel
-    h("div", { className: "hidden md:flex md:w-80 lg:w-96 flex-col shrink-0 my-5 mr-6 rounded-2xl shadow-sm overflow-hidden border border-gray-200", style: { background: C.panel } },
+    h("div", { className: "hidden md:flex md:w-80 lg:w-96 flex-col shrink-0 my-5 mr-6 rounded-2xl shadow-sm overflow-hidden border", style: { background: C.panel, borderColor: C.border } },
       h("div", { className: "px-5 py-4 flex items-center justify-between", style: { borderBottom: `1px solid ${C.border}`, background: C.roseTint } },
         h("h2", { className: "font-semibold text-sm flex items-center gap-2", style: { color: C.ink } }, h(IconCart, { size: 16, color: C.roseDeep }), t("checkout")),
-        h("span", { className: "text-xs font-bold px-2 py-0.5 rounded-full bg-white shadow-xs", style: { color: C.roseDeep } }, `${itemCount} ${t("items")}`)),
+        h("span", { className: "text-xs font-bold px-2 py-0.5 rounded-full shadow-xs", style: { background: C.panel, color: C.roseDeep } }, `${itemCount} ${t("items")}`)),
       h("div", { className: "flex-1 flex flex-col px-5 py-4 min-h-0" }, h(CartContents, cartProps))
     ),
 
-    // Mobile Bottom Cart Floating Bar
     (cart.length > 0 && !cartOpen) ? h("button", {
       onClick: () => setCartOpen(true),
       className: "md:hidden fixed left-4 right-4 z-30 rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-2xl" + (cartPulse ? " pos-cart-pulse" : ""),
@@ -962,15 +942,14 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
       h("span", { className: "text-xs font-bold flex items-center gap-1 uppercase tracking-wider bg-white/20 px-3 py-1 rounded-xl" }, t("viewCart"), h(IconChevron, { size: 14 }))
     ) : null,
 
-    // Mobile Cart Sheet
-    cartOpen ? h("div", { className: "md:hidden fixed inset-0 z-40 flex items-end justify-center pos-overlay-anim backdrop-blur-sm", style: { background: "rgba(30,24,26,0.5)" }, onClick: () => setCartOpen(false) },
+    cartOpen ? h("div", { className: "md:hidden fixed inset-0 z-40 flex items-end justify-center pos-overlay-anim backdrop-blur-sm", style: { background: "rgba(0,0,0,0.6)" }, onClick: () => setCartOpen(false) },
       h("div", {
-        className: "w-full rounded-t-2xl shadow-2xl flex flex-col pos-sheet-anim", style: { background: C.panel, maxHeight: "88vh" },
+        className: "w-full rounded-t-2xl shadow-2xl flex flex-col pos-sheet-anim border", style: { background: C.panel, borderColor: C.border, maxHeight: "88vh" },
         onClick: (e) => e.stopPropagation()
       },
         h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
           h("h2", { className: "font-semibold flex items-center gap-2 text-sm", style: { color: C.ink } }, h(IconCart, { size: 16, color: C.roseDeep }), t("checkout")),
-          h("button", { onClick: () => setCartOpen(false), className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+          h("button", { onClick: () => setCartOpen(false), className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
         h("div", { className: "flex-1 flex flex-col px-6 py-4 min-h-0", style: { paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } }, h(CartContents, cartProps))
       )
     ) : null,
@@ -980,9 +959,10 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   );
 }
 
-// ---------- Reports Page ----------
 function ReportsPage({ sales, products, exchangeRate }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const [period, setPeriod] = useState("day");
 
   const activeSales = useMemo(() => sales.filter(s => !s.voided), [sales]);
@@ -1021,11 +1001,11 @@ function ReportsPage({ sales, products, exchangeRate }) {
       h("div", null,
         h("h1", { className: "text-xl font-bold tracking-tight", style: { color: C.ink } }, t("reportsTitle")),
         h("p", { className: "text-xs font-medium", style: { color: C.inkDim } }, t("reportsSubtitle"))),
-      h("div", { className: "flex rounded-xl p-1 border border-gray-200 shadow-inner", style: { background: C.roseTint } },
+      h("div", { className: "flex rounded-xl p-1 border shadow-inner", style: { background: C.roseTint, borderColor: C.border } },
         ["day", "week", "month"].map(p => h("button", {
           key: p, onClick: () => setPeriod(p),
           className: "px-3.5 py-1.5 text-xs font-bold rounded-lg transition",
-          style: { background: period === p ? "#fff" : "transparent", color: period === p ? C.roseDeep : C.inkDim }
+          style: { background: period === p ? C.panel : "transparent", color: period === p ? C.roseDeep : C.inkDim }
         }, periodLabels[p])))),
     h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6 pb-6" },
       h("div", { className: "grid grid-cols-2 gap-3.5 mb-5" },
@@ -1037,7 +1017,7 @@ function ReportsPage({ sales, products, exchangeRate }) {
             h(StatCard, { label: t("totalRevenue"), value: moneyUSD(totals.revenue), subValue: moneyKHR(totals.revenue, exchangeRate), color: C.roseDeep, icon: IconTrend }),
             h(StatCard, { label: t("itemsSold"), value: totals.items, color: C.sage, icon: IconCart }),
             h(StatCard, { label: t("transactions"), value: totals.tx, color: C.ink, icon: IconChart })),
-          h("div", { className: "rounded-2xl p-5 mb-5 shadow-sm border border-gray-200", style: { background: C.panel } },
+          h("div", { className: "rounded-2xl p-5 mb-5 shadow-sm border", style: { background: C.panel, borderColor: C.border } },
             h("h3", { className: "text-xs font-bold tracking-wider uppercase mb-4", style: { color: C.inkDim } }, `${t("revenueBy")} ${periodLabels[period]}${chartData.length > 0 ? ` (${chartData.length})` : ""}`),
             h("div", { className: "flex items-end gap-2 pt-2", style: { height: 180 } },
               chartData.map(g => h("div", { key: g.key, className: "flex-1 flex flex-col items-center justify-end h-full group relative", title: `${g.key}: ${moneyUSD(g.revenue)}` },
@@ -1045,7 +1025,7 @@ function ReportsPage({ sales, products, exchangeRate }) {
                 h("div", { style: { width: "100%", maxWidth: 36, height: `${Math.max(6, (g.revenue / maxRevenue) * 140)}px`, background: "linear-gradient(180deg, #D48C9D 0%, #B85C70 100%)", borderRadius: "6px 6px 0 0" } }),
                 h("div", { className: "text-[10px] font-medium mt-2 text-center truncate w-full", style: { color: C.inkDim } }, g.key))))),
           h("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-5" },
-            h("div", { className: "lg:col-span-2 rounded-2xl overflow-hidden shadow-sm border border-gray-200", style: { background: C.panel } },
+            h("div", { className: "lg:col-span-2 rounded-2xl overflow-hidden shadow-sm border", style: { background: C.panel, borderColor: C.border } },
               h("table", { className: "w-full text-sm" },
                 h("thead", null, h("tr", { style: { background: C.roseTint } },
                   h("th", { className: "text-left px-4 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colPeriod")),
@@ -1059,9 +1039,9 @@ function ReportsPage({ sales, products, exchangeRate }) {
                   h("td", { className: "px-3 py-3 text-right tabular-nums text-xs", style: { color: C.inkDim } }, g.itemsSold),
                   h("td", { className: "px-3 py-3 text-right tabular-nums text-xs font-semibold", style: { color: C.ink } }, moneyUSD(g.revenue)),
                   h("td", { className: "px-4 py-3 text-right tabular-nums text-xs font-semibold", style: { color: C.sage } }, moneyUSD(g.revenue - g.cost))))))),
-            h("div", { className: "rounded-2xl p-5 shadow-sm border border-gray-200", style: { background: C.panel } },
+            h("div", { className: "rounded-2xl p-5 shadow-sm border", style: { background: C.panel, borderColor: C.border } },
               h("h3", { className: "text-xs font-bold tracking-wider uppercase mb-3.5 flex items-center gap-1.5", style: { color: C.inkDim } }, h(IconTrend, { size: 14, color: C.roseDeep }), t("topProducts")),
-              h("div", { className: "space-y-3" }, topProducts.map((p, i) => h("div", { key: i, className: "flex items-center justify-between text-xs pb-2 border-b border-gray-100 last:border-none" },
+              h("div", { className: "space-y-3" }, topProducts.map((p, i) => h("div", { key: i, className: "flex items-center justify-between text-xs pb-2 border-b last:border-none", style: { borderColor: C.border } },
                 h("div", { className: "min-w-0 pr-2" }, h("div", { className: "truncate font-semibold", style: { color: C.ink } }, p.name), h("div", { className: "text-[11px]", style: { color: C.inkDim } }, `${p.qty} ${t("sold")}`)),
                 h("div", { className: "tabular-nums font-bold shrink-0", style: { color: C.roseDeep } }, moneyUSD(p.revenue)))))))
         )
@@ -1070,7 +1050,9 @@ function ReportsPage({ sales, products, exchangeRate }) {
 }
 
 function StatCard({ label, value, subValue, color, icon }) {
-  return h("div", { className: "rounded-2xl p-4 shadow-sm border border-gray-200 flex items-center justify-between", style: { background: C.panel } },
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
+  return h("div", { className: "rounded-2xl p-4 shadow-sm border flex items-center justify-between", style: { background: C.panel, borderColor: C.border } },
     h("div", null,
       h("div", { className: "text-[11px] font-bold tracking-wider uppercase mb-1", style: { color: C.inkDim } }, label),
       h("div", { className: "text-xl font-extrabold tabular-nums", style: { color } }, value),
@@ -1078,9 +1060,10 @@ function StatCard({ label, value, subValue, color, icon }) {
     icon ? h("div", { className: "p-2.5 rounded-xl", style: { background: C.roseTint } }, h(icon, { size: 18, color: C.roseDeep })) : null);
 }
 
-// ---------- Sales History Page ----------
 function SalesHistoryPage({ sales, exchangeRate, onVoid, onViewReceipt }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const [confirmVoid, setConfirmVoid] = useState(null);
   const sorted = useMemo(() => [...sales].sort((a, b) => b.timestamp - a.timestamp), [sales]);
   const fmtDate = (ts) => new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
@@ -1094,7 +1077,7 @@ function SalesHistoryPage({ sales, exchangeRate, onVoid, onViewReceipt }) {
       : h("div", { className: "space-y-3" }, sorted.map(sale => {
           const itemsSummary = sale.items.map(i => `${i.name} ×${i.qty}`).join(", ");
           return h("div", {
-            key: sale.id, className: "rounded-2xl p-4 shadow-sm border border-gray-200 cursor-pointer hover:border-gray-300 transition-all", style: { background: C.panel, opacity: sale.voided ? 0.6 : 1 },
+            key: sale.id, className: "rounded-2xl p-4 shadow-sm border cursor-pointer transition-all", style: { background: C.panel, borderColor: C.border, opacity: sale.voided ? 0.6 : 1 },
             onClick: () => onViewReceipt && onViewReceipt(sale)
           },
             h("div", { className: "flex items-start justify-between gap-3 flex-wrap" },
@@ -1109,7 +1092,7 @@ function SalesHistoryPage({ sales, exchangeRate, onVoid, onViewReceipt }) {
                   ? h("span", { className: "text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider", style: { background: C.warnTint, color: C.warn } }, t("voided"))
                   : h("button", {
                       onClick: (e) => { e.stopPropagation(); setConfirmVoid(sale); },
-                      className: "text-xs px-3 py-1.5 rounded-xl font-semibold border transition hover:bg-rose-50",
+                      className: "text-xs px-3 py-1.5 rounded-xl font-semibold border transition",
                       style: { borderColor: C.warn, color: C.warn }
                     }, t("voidSale")))));
         }))),
@@ -1118,7 +1101,7 @@ function SalesHistoryPage({ sales, exchangeRate, onVoid, onViewReceipt }) {
         h("h3", { className: "font-semibold text-base mb-1", style: { color: C.ink } }, t("voidConfirmTitle")),
         h("p", { className: "text-xs mb-5 leading-relaxed", style: { color: C.inkDim } }, t("voidConfirmBody")),
         h("div", { className: "flex justify-end gap-2" },
-          h("button", { onClick: () => setConfirmVoid(null), className: "pos-btn-ghost" }, t("cancel")),
+          h("button", { onClick: () => setConfirmVoid(null), className: "pos-btn-ghost", style: { color: C.inkDim } }, t("cancel")),
           h("button", {
             onClick: () => { onVoid(confirmVoid.id); setConfirmVoid(null); },
             className: "pos-btn-primary", style: { background: C.warn, color: "#fff" }
@@ -1126,9 +1109,10 @@ function SalesHistoryPage({ sales, exchangeRate, onVoid, onViewReceipt }) {
   );
 }
 
-// ---------- Receipt Modal ----------
 function ReceiptModal({ sale, qrCode, exchangeRate, onClose }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const fmtDate = (ts) => new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
   const receiptId = "#" + sale.id.slice(-8).toUpperCase();
   const doPrint = () => window.print();
@@ -1136,12 +1120,12 @@ function ReceiptModal({ sale, qrCode, exchangeRate, onClose }) {
   return h(SheetShell, { onClose, maxWidth: "max-w-sm" },
     h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
       h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("receiptTitle")),
-      h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+      h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
     h("div", { className: "flex-1 px-6 py-5 overflow-y-auto" },
       h("div", {
         id: "receipt-print-area",
-        className: "bg-white p-4 rounded-xl shadow-inner border border-gray-100",
-        style: { fontFamily: "'Courier New', monospace", fontSize: 12, color: C.ink, width: "100%", maxWidth: 280, margin: "0 auto" }
+        className: "p-4 rounded-xl shadow-inner border border-gray-100",
+        style: { fontFamily: "'Courier New', monospace", fontSize: 12, color: "#000", background: "#fff", width: "100%", maxWidth: 280, margin: "0 auto" }
       },
         h("div", { style: { textAlign: "center", fontWeight: 700, fontSize: 15 } }, "MAKARA COSMETICS"),
         h("div", { style: { textAlign: "center", marginTop: 2, fontSize: 11 } }, fmtDate(sale.timestamp)),
@@ -1162,24 +1146,25 @@ function ReceiptModal({ sale, qrCode, exchangeRate, onClose }) {
           h("div", { style: { marginTop: 4, fontSize: 10 } }, "Scan KHQR to Pay")) : null
       )),
     h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
-      h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("closeReceipt")),
-      h("button", { onClick: doPrint, className: "pos-btn-primary flex items-center gap-1.5" }, h(IconPrint, { size: 14 }), t("printReceipt")))
+      h("button", { onClick: onClose, className: "pos-btn-ghost", style: { color: C.inkDim } }, t("closeReceipt")),
+      h("button", { onClick: doPrint, className: "pos-btn-primary flex items-center gap-1.5", style: { background: C.roseDeep, color: "#fff" } }, h(IconPrint, { size: 14 }), t("printReceipt")))
   );
 }
 
-// ---------- Stock Log Modal ----------
 function StockLogModal({ stockLog, onClose }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const sorted = useMemo(() => [...stockLog].sort((a, b) => b.timestamp - a.timestamp).slice(0, 100), [stockLog]);
   const fmtDate = (ts) => new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
   return h(SheetShell, { onClose },
     h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
       h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("stockLogTitle")),
-      h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+      h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
     h("div", { className: "flex-1 px-6 py-4 space-y-2 overflow-y-auto" },
       sorted.length === 0 ? h("p", { className: "text-xs text-center py-8", style: { color: C.inkDim } }, t("noStockLog"))
-      : sorted.map((l, i) => h("div", { key: i, className: "flex items-center justify-between text-xs py-2.5 border-b border-gray-100 last:border-none" },
+      : sorted.map((l, i) => h("div", { key: i, className: "flex items-center justify-between text-xs py-2.5 border-b last:border-none", style: { borderColor: C.border } },
           h("div", { className: "min-w-0 pr-2" },
             h("div", { className: "font-semibold truncate", style: { color: C.ink } }, l.productName),
             h("div", { className: "text-[11px]", style: { color: C.inkDim } }, `${fmtDate(l.timestamp)}${l.reason ? " · " + l.reason : ""}`)),
@@ -1188,9 +1173,10 @@ function StockLogModal({ stockLog, onClose }) {
   );
 }
 
-// ---------- Settings Sheet ----------
 function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, onImport, onClose }) {
   const t = useT();
+  const theme = React.useContext(ThemeContext);
+  const C = THEMES[theme];
   const fileRef = useRef(null);
   const qrFileRef = useRef(null);
   const [qrBusy, setQrBusy] = useState(false);
@@ -1238,27 +1224,27 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
     onSaveSettings({ ...settings, lowStockThreshold: n, exchangeRate: r });
   };
 
+  const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
+
   return h(SheetShell, { onClose },
       h("div", { className: "flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
         h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("settings")),
-        h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+        h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
       h("div", { className: "px-6 py-5 space-y-5 flex-1 overflow-y-auto" },
 
-        // Currency Exchange Rate Setting
-        h("div", { className: "p-4 rounded-2xl border border-gray-200" },
+        h("div", { className: "p-4 rounded-2xl border", style: { background: C.panel, borderColor: C.border } },
           h(Field, { label: t("exchangeRateLabel") },
             h("div", { className: "flex items-center gap-2 mt-1" },
-              h("input", { type: "number", min: "1000", step: "50", className: "pos-input flex-1 text-xs font-semibold tabular-nums", value: exchangeRate, onChange: (e) => setExchangeRate(e.target.value), onBlur: commitSettings }),
-              h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border border-gray-200" }, t("saveChanges"))))),
+              h("input", { type: "number", min: "1000", step: "50", className: "pos-input flex-1 text-xs font-semibold tabular-nums", style: inputStyle, value: exchangeRate, onChange: (e) => setExchangeRate(e.target.value), onBlur: commitSettings }),
+              h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border", style: { borderColor: C.border, color: C.ink } }, t("saveChanges"))))),
 
-        // QR Code Section
-        h("div", { className: "p-4 rounded-2xl border border-gray-200", style: { background: C.roseTint } },
+        h("div", { className: "p-4 rounded-2xl border", style: { background: C.roseTint, borderColor: C.border } },
           h("div", { className: "text-xs font-bold tracking-wider uppercase mb-2", style: { color: C.ink } }, t("paymentQr")),
           h("div", { className: "flex items-center gap-3" },
             h("button", {
               onClick: () => qrFileRef.current && qrFileRef.current.click(),
-              className: "w-16 h-16 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-sm transition hover:opacity-90",
-              style: { background: "#fff", border: `1.5px dashed ${C.rose}` }
+              className: "w-16 h-16 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-sm transition hover:opacity-90 border",
+              style: { background: C.panel, borderColor: C.rose }
             }, qrBusy ? "..." : settings.qrCode ? h("img", { src: settings.qrCode, className: "w-full h-full object-contain" }) : h(IconQr, { size: 24, color: C.roseDeep })),
             h("div", { className: "text-xs", style: { color: C.inkDim } },
               h("button", { onClick: () => qrFileRef.current && qrFileRef.current.click(), className: "font-semibold underline block", style: { color: C.roseDeep } }, t("uploadQr")),
@@ -1266,21 +1252,19 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
               settings.qrCode ? h("button", { onClick: () => onSaveSettings({ ...settings, qrCode: "" }), className: "mt-1.5 font-medium underline block", style: { color: C.warn } }, t("removeQr")) : null),
             h("input", { ref: qrFileRef, type: "file", accept: "image/*", className: "hidden", onChange: handleQrFile }))),
 
-        // Low stock threshold
-        h("div", { className: "p-4 rounded-2xl border border-gray-200" },
+        h("div", { className: "p-4 rounded-2xl border", style: { background: C.panel, borderColor: C.border } },
           h(Field, { label: t("lowStockThreshold") },
             h("div", { className: "flex items-center gap-2 mt-1" },
-              h("input", { type: "number", min: "0", step: "1", className: "pos-input w-24 text-xs font-semibold", value: threshold, onChange: (e) => setThreshold(e.target.value), onBlur: commitSettings }),
-              h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border border-gray-200" }, t("saveChanges")))),
+              h("input", { type: "number", min: "0", step: "1", className: "pos-input w-24 text-xs font-semibold", style: inputStyle, value: threshold, onChange: (e) => setThreshold(e.target.value), onBlur: commitSettings }),
+              h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border", style: { borderColor: C.border, color: C.ink } }, t("saveChanges")))),
           h("p", { className: "text-[11px] mt-2", style: { color: C.inkDim } }, t("lowStockThresholdHint")),
           h("button", { onClick: () => setLogOpen(true), className: "text-xs mt-3 font-semibold underline block", style: { color: C.roseDeep } }, t("viewStockLog"))),
 
-        // Data Backup
-        h("div", { className: "p-4 rounded-2xl border border-gray-200" },
+        h("div", { className: "p-4 rounded-2xl border", style: { background: C.panel, borderColor: C.border } },
           h("p", { className: "text-xs mb-3 leading-relaxed", style: { color: C.inkDim } }, t("settingsDataNote")),
-          h("button", { onClick: exportData, className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border border-gray-200 transition hover:bg-gray-50" },
+          h("button", { onClick: exportData, className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border transition", style: { borderColor: C.border, color: C.ink } },
             h("span", null, t("exportBackup")), h(IconDown, { size: 14, color: C.sage })),
-          h("button", { onClick: () => fileRef.current && fileRef.current.click(), className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border border-gray-200 mt-2 transition hover:bg-gray-50" },
+          h("button", { onClick: () => fileRef.current && fileRef.current.click(), className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border mt-2 transition", style: { borderColor: C.border, color: C.ink } },
             h("span", null, t("restoreBackup")), h(IconUp, { size: 14, color: C.roseDeep })),
           h("input", { ref: fileRef, type: "file", accept: "application/json", className: "hidden", onChange: handleFile }))
       ),
@@ -1288,48 +1272,46 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
   );
 }
 
-// ---------- Main App Container ----------
 function App() {
   const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState({ exchangeRate: 4100, lowStockThreshold: 5, qrCode: "" });
+  const [settings, setSettings] = useState({ exchangeRate: 4100, lowStockThreshold: 5, qrCode: "", theme: "dark" });
   const [stockLog, setStockLog] = useState([]);
   const [cart, setCart] = useState([]);
   const [page, setPage] = useState("sales");
   const [toast, setToast] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [lang, setLang] = useState("en");
-  const [cloudStatus, setCloudStatus] = useState("syncing");
   const [now, setNow] = useState(() => Date.now());
   const [lastSale, setLastSale] = useState(null);
   const [viewSale, setViewSale] = useState(null);
 
   const t = (key) => (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
+  const currentTheme = settings.theme || "dark";
+  const C = THEMES[currentTheme];
 
-  // Load IndexedDB on Mount
   useEffect(() => {
     let active = true;
     (async () => {
       await syncLegacyStorage();
       const p = await getDBItem("products", "main", []);
       const s = await getDBItem("sales", "main", []);
-      const set = await getDBItem("settings", "main", { exchangeRate: 4100, lowStockThreshold: 5, qrCode: "" });
+      const set = await getDBItem("settings", "main", { exchangeRate: 4100, lowStockThreshold: 5, qrCode: "", theme: "dark" });
       const log = await getDBItem("stockLog", "main", []);
-      if (active) {
-        setProducts(p); setSales(s); setSettings(set); setStockLog(log);
-        setCloudStatus("online");
-      }
+      if (active) { setProducts(p); setSales(s); setSettings(set); setStockLog(log); }
     })();
     return () => { active = false; };
   }, []);
 
-  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    document.body.style.backgroundColor = C.bg;
+    document.body.style.color = C.ink;
+  }, [currentTheme]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "F2") {
-        e.preventDefault();
-        document.getElementById("pos-search-input")?.focus();
-      } else if (e.key === "Escape") {
+      if (e.key === "F2") { e.preventDefault(); document.getElementById("pos-search-input")?.focus(); }
+      else if (e.key === "Escape") {
         if (settingsOpen) setSettingsOpen(false);
         else if (lastSale) setLastSale(null);
         else if (viewSale) setViewSale(null);
@@ -1353,8 +1335,12 @@ function App() {
     await setDBItem("stockLog", "main", nextStockLog);
   };
 
-  const changeLang = (l) => setLang(l);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2200); };
+
+  const toggleTheme = () => {
+    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+    persist(products, sales, { ...settings, theme: nextTheme }, stockLog);
+  };
 
   const addProduct = (p) => { const next = [...products, p]; persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); };
   const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); };
@@ -1369,9 +1355,7 @@ function App() {
     showToast(t("stockAdjusted"));
   };
 
-  const saveSettings = (nextSettings) => {
-    persist(products, sales, nextSettings, stockLog);
-  };
+  const saveSettings = (nextSettings) => { persist(products, sales, nextSettings, stockLog); };
 
   const importProducts = (rows) => {
     let updated = 0, added = 0;
@@ -1428,64 +1412,67 @@ function App() {
   const clockStr = new Date(now).toLocaleString(lang === "km" ? "km-KH" : "en-US", { hour: "numeric", minute: "2-digit" });
 
   return h(LangContext.Provider, { value: lang },
-  h("div", { className: "w-full min-h-screen flex flex-col", style: { background: C.bg } },
+  h(ThemeContext.Provider, { value: currentTheme },
+  h("div", { className: "w-full min-h-screen flex flex-col", style: { background: C.bg, color: C.ink } },
 
-    // Header Navbar
-    h("header", { className: "w-full shadow-lg shrink-0 border-b border-white/10 z-30", style: { background: C.ink, color: "#fff" } },
+    h("header", { className: "w-full shadow-lg shrink-0 border-b z-30", style: { background: C.panel, borderColor: C.border } },
       h("div", { className: "max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 sm:px-6 py-3" },
         
         h("div", { className: "flex items-center gap-2.5 min-w-0 shrink-0" },
-          h("div", { className: "p-2 rounded-xl shadow-inner", style: { background: "rgba(252, 235, 240, 0.12)" } },
-            h(IconSparkles, { size: 18, color: C.rose })),
+          h("div", { className: "p-2 rounded-xl shadow-inner", style: { background: C.roseTint } },
+            h(IconSparkles, { size: 18, color: C.roseDeep })),
           h("div", { className: "min-w-0" },
-            h("div", { className: "brand-font text-base sm:text-lg font-semibold tracking-wider text-white truncate" }, "MAKARA"),
-            h("div", { className: "text-[9px] uppercase tracking-widest font-bold opacity-60 text-pink-100" }, "Cosmetics POS"))),
+            h("div", { className: "brand-font text-base sm:text-lg font-semibold tracking-wider truncate", style: { color: C.ink } }, "MAKARA"),
+            h("div", { className: "text-[9px] uppercase tracking-widest font-bold opacity-60" }, "Cosmetics POS"))),
 
-        h("nav", { className: "hidden md:flex items-center gap-1.5 p-1 rounded-2xl border border-white/10", style: { background: "rgba(255,255,255,0.05)" } },
+        h("nav", { className: "hidden md:flex items-center gap-1.5 p-1 rounded-2xl border", style: { background: C.bg, borderColor: C.border } },
           NAV.map(n => {
             const active = page === n.id;
             return h("button", {
               key: n.id, onClick: () => { setPage(n.id); triggerHaptic(8); playPOSSound("add"); },
               className: "pos-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-wide transition-all",
-              style: { background: active ? C.roseDeep : "transparent", color: active ? "#fff" : "rgba(255,255,255,0.7)" }
+              style: { background: active ? C.roseDeep : "transparent", color: active ? "#fff" : C.inkDim }
             }, h(n.icon, { size: 14 }), h("span", null, n.label));
           })),
 
         h("div", { className: "flex items-center gap-2 shrink-0" },
-          h("div", { className: "hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-1 rounded-full border border-white/10 bg-white/5 opacity-80" },
-            h(IconClock, { size: 12, color: C.rose }), h("span", null, clockStr)),
+          h("div", { className: "hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-1 rounded-full border opacity-80", style: { borderColor: C.border, background: C.bg, color: C.ink } },
+            h(IconClock, { size: 12, color: C.roseDeep }), h("span", null, clockStr)),
 
-          h("div", { className: "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wider border border-white/10 bg-white/5" },
-            h("span", { className: "w-2 h-2 rounded-full shrink-0 animate-pulse", style: { background: C.sage } }),
-            h("span", { className: "hidden lg:inline opacity-80" }, t("statusOffline"))),
+          // Night/Light Mode Toggle Button
+          h("button", {
+            onClick: toggleTheme,
+            className: "pos-nav-btn flex items-center justify-center w-8 h-8 rounded-xl border transition",
+            style: { borderColor: C.border, background: C.bg, color: C.roseDeep },
+            title: "Toggle Theme"
+          }, currentTheme === "dark" ? h(IconSun, { size: 16 }) : h(IconMoon, { size: 16 })),
 
-          h("div", { className: "flex rounded-xl overflow-hidden text-xs font-bold border border-white/10 bg-white/5 p-0.5" },
-            h("button", { onClick: () => changeLang("en"), className: "px-2 py-0.5 rounded-lg transition", style: { background: lang === "en" ? C.roseDeep : "transparent", color: "#fff" } }, "EN"),
-            h("button", { onClick: () => changeLang("km"), className: "px-2 py-0.5 rounded-lg transition", style: { background: lang === "km" ? C.roseDeep : "transparent", color: "#fff" } }, "ខ្មែរ")),
+          h("div", { className: "flex rounded-xl overflow-hidden text-xs font-bold border p-0.5", style: { borderColor: C.border, background: C.bg } },
+            h("button", { onClick: () => setLang("en"), className: "px-2 py-0.5 rounded-lg transition", style: { background: lang === "en" ? C.roseDeep : "transparent", color: lang === "en" ? "#fff" : C.ink } }, "EN"),
+            h("button", { onClick: () => setLang("km"), className: "px-2 py-0.5 rounded-lg transition", style: { background: lang === "km" ? C.roseDeep : "transparent", color: lang === "km" ? "#fff" : C.ink } }, "ខ្មែរ")),
 
           h("button", {
             onClick: () => setSettingsOpen(true),
-            className: "pos-nav-btn flex items-center justify-center w-8 h-8 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition",
+            className: "pos-nav-btn flex items-center justify-center w-8 h-8 rounded-xl border transition",
+            style: { borderColor: C.border, background: C.bg, color: C.ink },
             title: t("settings")
           }, h(IconSettings, { size: 16 }))
         )
       ),
 
-      h("div", { className: "md:hidden flex items-center justify-around px-2 py-1.5 border-t border-white/10 bg-black/20" },
+      h("div", { className: "md:hidden flex items-center justify-around px-2 py-1.5 border-t", style: { borderColor: C.border, background: C.panel } },
         NAV.map(n => {
           const active = page === n.id;
           return h("button", {
             key: n.id, onClick: () => { setPage(n.id); triggerHaptic(8); playPOSSound("add"); },
             className: "flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[10px] font-medium transition",
-            style: { color: active ? C.rose : "rgba(255,255,255,0.6)" }
+            style: { color: active ? C.roseDeep : C.inkDim }
           }, h(n.icon, { size: 16 }), h("span", null, n.label));
         }))
     ),
 
-    // Keyboard Shortcuts Bar
-    h("div", { className: "w-full bg-pink-950/20 text-center py-1 text-[11px] font-mono opacity-60 hidden md:block" }, t("shortcutHint")),
+    h("div", { className: "w-full text-center py-1 text-[11px] font-mono opacity-60 hidden md:block border-b", style: { borderColor: C.border, background: C.panel } }, t("shortcutHint")),
 
-    // Main Content Area
     h("main", { className: "flex-1 min-w-0" },
       page === "inventory" ? h(InventoryPage, { products, exchangeRate: settings.exchangeRate || 4100, onAdd: addProduct, onEdit: editProduct, onDelete: deleteProduct, onAdjustStock: adjustStock, lowStockThreshold: settings.lowStockThreshold, onImportProducts: importProducts }) : null,
       page === "sales" ? h(SalesPage, { products, cart, setCart, exchangeRate: settings.exchangeRate || 4100, onCheckout: handleCheckout, onAddProduct: addProduct }) : null,
@@ -1496,7 +1483,7 @@ function App() {
     lastSale ? h(ReceiptModal, { sale: lastSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setLastSale(null) }) : null,
     viewSale ? h(ReceiptModal, { sale: viewSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setViewSale(null) }) : null,
     h(Toast, { message: toast })
-  ));
+  )));
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(h(App));
