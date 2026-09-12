@@ -38,7 +38,7 @@
     padding: 8px 12px;
     font-size: 13.5px;
     outline: none;
-    transition: all 0.18s ease;
+    transition: all 0.2s ease;
   }
   .pos-input-search { padding-left: 36px; }
 
@@ -263,7 +263,6 @@ async function syncLegacyStorage() {
 const { useState, useEffect, useMemo, useRef } = React;
 const h = React.createElement;
 
-// ---------- Theme Palettes (Default to Dark Mode) ----------
 const THEMES = {
   dark: {
     bg: "#120E10", panel: "#1B1517", ink: "#F4EFF1", inkDim: "#A5989D", border: "#2E2428",
@@ -279,7 +278,6 @@ const THEMES = {
   }
 };
 
-// ---------- SVG Vector Icons ----------
 function SvgIcon({ d, size = 16, className = "", color = "currentColor", strokeWidth = 2, children }) {
   return h("svg", {
     xmlns: "http://www.w3.org/2000/svg", width: size, height: size, viewBox: "0 0 24 24",
@@ -314,7 +312,6 @@ const IconCash = (p) => h(SvgIcon, { d: "M2 6h20v12H2zm4 3h.01M18 15h.01M12 9a3 
 const IconSun = (p) => h(SvgIcon, { d: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z", ...p });
 const IconMoon = (p) => h(SvgIcon, { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z", ...p });
 
-// ---------- Translations ----------
 const STRINGS = {
   en: {
     navSales: "Sales", navInventory: "Inventory", navReports: "Reports", navSalesHistory: "Sales History", settings: "Settings",
@@ -845,6 +842,8 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   const [typeFilter, setTypeFilter] = useState("");
   const [flashId, setFlashId] = useState(null);
   const [cartPulse, setCartPulse] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const searchInputRef = useRef(null);
 
   const types = useMemo(() => Array.from(new Set(products.map(p => (p.type || "").trim()).filter(Boolean))).sort(), [products]);
   const filtered = products.filter(p =>
@@ -884,22 +883,68 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   const cartProps = { cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout: () => setPaymentModalOpen(true), flashId };
   const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
 
+  useEffect(() => {
+    if (searchExpanded && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchExpanded]);
+
   return h("div", { className: "flex flex-col md:flex-row h-full pos-page-anim max-w-7xl mx-auto w-full" },
     h("div", { className: "flex-1 flex flex-col min-w-0" },
-      h("div", { className: "px-4 sm:px-6 pt-5 pb-4" },
-        h("div", { className: "hidden md:flex items-center justify-between mb-4" },
+      h("div", { className: "px-4 sm:px-6 pt-5 pb-3 space-y-3" },
+        
+        // Header Title & Add Item Button
+        h("div", { className: "hidden md:flex items-center justify-between" },
           h("h1", { className: "text-xl font-bold tracking-tight", style: { color: C.ink } }, t("salesTitle")),
           h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border", style: { borderColor: C.border, color: C.ink } }, h(IconPlus, { size: 14, color: C.roseDeep }), t("addNewItem"))),
-        h("div", { className: "flex items-center gap-2" },
-          h("div", { className: "relative flex-1" },
-            h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 opacity-60" }, h(IconSearch, { size: 14 })),
-            h("input", { id: "pos-search-input", value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchProducts"), className: "pos-input pos-input-search w-full max-w-sm shadow-sm", style: inputStyle })),
-          h("button", { onClick: () => setQuickAdd(true), className: "md:hidden p-2.5 rounded-xl shrink-0 border shadow-sm", style: { background: C.roseTint, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 16 }))),
-        types.length > 0 ? h("div", { className: "mt-2.5" },
-          h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full max-w-sm", style: inputStyle },
-            h("option", { value: "" }, t("filterAllTypes")),
-            types.map(ty => h("option", { key: ty, value: ty }, ty)))
-        ) : null),
+
+        // Brand / Category Filter Pills (Visible on top of search bar)
+        types.length > 0 ? h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
+          h("button", {
+            onClick: () => { setTypeFilter(""); triggerHaptic(6); playPOSSound("add"); },
+            className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
+            style: {
+              background: typeFilter === "" ? C.roseDeep : C.inputBg,
+              borderColor: typeFilter === "" ? C.roseDeep : C.border,
+              color: typeFilter === "" ? "#fff" : C.inkDim
+            }
+          }, t("filterAllTypes")),
+          types.map(ty => h("button", {
+            key: ty,
+            onClick: () => { setTypeFilter(ty); triggerHaptic(6); playPOSSound("add"); },
+            className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
+            style: {
+              background: typeFilter === ty ? C.roseDeep : C.inputBg,
+              borderColor: typeFilter === ty ? C.roseDeep : C.border,
+              color: typeFilter === ty ? "#fff" : C.inkDim
+            }
+          }, ty))
+        ) : null,
+
+        // Search Bar & Quick Add (Expandable Search Icon)
+        h("div", { className: "flex items-center justify-between gap-2" },
+          h("div", { className: "relative flex items-center transition-all duration-300", style: { width: searchExpanded ? "100%" : "42px", maxWidth: searchExpanded ? "380px" : "42px" } },
+            searchExpanded ? h(React.Fragment, null,
+              h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none" }, h(IconSearch, { size: 16, color: C.roseDeep })),
+              h("input", {
+                ref: searchInputRef, id: "pos-search-input", value: query,
+                onChange: (e) => setQuery(e.target.value),
+                onBlur: () => { if (!query) setSearchExpanded(false); },
+                placeholder: t("searchProducts"),
+                className: "pos-input pos-input-search w-full shadow-sm text-xs", style: inputStyle
+              }),
+              query ? h("button", { onClick: () => { setQuery(""); setSearchExpanded(false); }, className: "absolute right-2.5 top-1/2 -translate-y-1/2 opacity-60 hover:opacity-100" }, h(IconX, { size: 14 })) : null
+            ) : h("button", {
+              onClick: () => setSearchExpanded(true),
+              className: "w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm transition hover:scale-105 shrink-0",
+              style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep },
+              title: t("searchProducts")
+            }, h(IconSearch, { size: 18 }))
+          ),
+          h("button", { onClick: () => setQuickAdd(true), className: "md:hidden p-2.5 rounded-xl shrink-0 border shadow-sm", style: { background: C.roseTint, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 16 }))
+        )
+      ),
+
       h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6", style: { paddingBottom: cart.length > 0 ? "5.5rem" : "1.5rem" } },
         products.length === 0 ? h(EmptyState, { icon: IconCart, title: t("nothingToSellTitle"), body: t("nothingToSellBody") })
         : h("div", { className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4" },
@@ -1439,7 +1484,6 @@ function App() {
           h("div", { className: "hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-1 rounded-full border opacity-80", style: { borderColor: C.border, background: C.bg, color: C.ink } },
             h(IconClock, { size: 12, color: C.roseDeep }), h("span", null, clockStr)),
 
-          // Night/Light Mode Toggle Button
           h("button", {
             onClick: toggleTheme,
             className: "pos-nav-btn flex items-center justify-center w-8 h-8 rounded-xl border transition",
