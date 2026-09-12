@@ -2,15 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-<title>Makara Cosmetic — Luxury POS</title>
-<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>Makara Cosmetic — Enterprise POS</title>
+<meta name="theme-color" content="#1E181A" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
+
+<!-- Inline PWA Web Application Manifest -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"Makara Cosmetic POS","short_name":"MakaraPOS","start_url":".","display":"standalone","background_color":"#F8F5F6","theme_color":"#1E181A","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
+
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap');
 
   body {
     margin: 0;
@@ -18,22 +24,18 @@
     background-color: #F8F5F6;
     color: #1E181A;
     -webkit-font-smoothing: antialiased;
+    user-select: none;
   }
 
-  .brand-font {
-    font-family: 'Playfair Display', Georgia, serif;
-  }
-
+  .brand-font { font-family: 'Playfair Display', Georgia, serif; }
   .tabular-nums { font-variant-numeric: tabular-nums; }
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-  /* Custom crisp scrollbars */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #E2D7DA; border-radius: 99px; }
   ::-webkit-scrollbar-thumb:hover { background: #C8B8BD; }
 
-  /* Controls & Component Styling */
   .pos-input {
     border: 1px solid #EDE4E7;
     border-radius: 12px;
@@ -88,10 +90,7 @@
     justify-content: center;
     cursor: pointer;
   }
-  .pos-btn-ghost:hover {
-    background: #F3EAEF;
-    color: #1E181A;
-  }
+  .pos-btn-ghost:hover { background: #F3EAEF; color: #1E181A; }
   .pos-btn-ghost:active { transform: scale(0.96); }
 
   .pos-product-card {
@@ -104,8 +103,8 @@
   }
   .pos-product-card:not(:disabled):hover {
     border-color: #D9B4BD;
-    box-shadow: 0 8px 24px rgba(184, 92, 112, 0.1);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(184, 92, 112, 0.14);
+    transform: translateY(-3px) scale(1.01);
   }
   .pos-product-card:not(:disabled):active {
     transform: translateY(0) scale(0.98);
@@ -113,90 +112,51 @@
   }
 
   .pos-stepper {
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #E2D4D8;
-    color: #8A3D4E;
-    background: #FFFFFF;
-    transition: all 0.12s ease;
-    cursor: pointer;
+    width: 26px; height: 26px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #E2D4D8; color: #8A3D4E; background: #FFFFFF;
+    transition: all 0.12s ease; cursor: pointer;
   }
   .pos-stepper:disabled { opacity: 0.35; cursor: not-allowed; }
-  .pos-stepper:not(:disabled):hover {
-    background: #F8EBF0;
-    border-color: #B85C70;
-  }
+  .pos-stepper:not(:disabled):hover { background: #F8EBF0; border-color: #B85C70; }
   .pos-stepper:not(:disabled):active { transform: scale(0.9); }
 
   .pos-stepper-lg {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #E2D4D8;
-    color: #8A3D4E;
-    background: #FFFFFF;
-    transition: all 0.12s ease;
-    cursor: pointer;
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #E2D4D8; color: #8A3D4E; background: #FFFFFF;
+    transition: all 0.12s ease; cursor: pointer;
   }
   .pos-stepper-lg:disabled { opacity: 0.35; cursor: not-allowed; }
-  .pos-stepper-lg:not(:disabled):hover {
-    background: #F8EBF0;
-    border-color: #B85C70;
-  }
+  .pos-stepper-lg:not(:disabled):hover { background: #F8EBF0; border-color: #B85C70; }
   .pos-stepper-lg:not(:disabled):active { transform: scale(0.92); }
 
-  .pos-nav-btn {
-    transition: all 0.15s ease;
-    cursor: pointer;
-  }
+  .pos-nav-btn { transition: all 0.15s ease; cursor: pointer; }
   .pos-nav-btn:active { transform: scale(0.95); }
 
-  /* Animations */
   @keyframes pos-fade-in { from { opacity: 0; } to { opacity: 1; } }
   @keyframes pos-sheet-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pos-modal-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes pos-toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
   @keyframes pos-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
   @keyframes pos-flash { 0% { background-color: rgba(248, 235, 240, 0.9); } 100% { background-color: transparent; } }
-  @keyframes pos-pop-in { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
   .pos-page-anim { animation: pos-fade-in 0.22s ease; }
   .pos-overlay-anim { animation: pos-fade-in 0.18s ease; }
   .pos-sheet-anim { animation: pos-sheet-up 0.24s cubic-bezier(0.16, 1, 0.3, 1); }
   .pos-modal-anim { animation: pos-modal-in 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
   .pos-toast-anim { animation: pos-toast-in 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
-  .pos-card-anim { animation: pos-pop-in 0.2s ease backwards; }
   .pos-cart-pulse { animation: pos-pulse 0.28s ease; }
   .pos-row-flash { animation: pos-flash 0.6s ease; }
 
-  @media (prefers-reduced-motion: reduce) {
-    .pos-page-anim, .pos-overlay-anim, .pos-sheet-anim, .pos-modal-anim, .pos-toast-anim, .pos-card-anim, .pos-cart-pulse, .pos-row-flash {
-      animation: none !important;
-    }
-    .pos-product-card, .pos-btn-primary, .pos-btn-ghost, .pos-stepper, .pos-stepper-lg, .pos-nav-btn {
-      transition: none !important;
-    }
-  }
-
-  /* Thermal Receipt Print Area */
   @media print {
     body * { visibility: hidden; }
     #receipt-print-area, #receipt-print-area * { visibility: visible; }
     #receipt-print-area {
-      position: absolute; left: 0; top: 0;
-      width: 100% !important; max-width: 100% !important;
-      padding: 10mm;
-      font-family: 'Courier New', monospace; color: #000;
-      font-size: 13px;
+      position: absolute; left: 0; top: 0; width: 100% !important;
+      padding: 8mm; font-family: 'Courier New', monospace; color: #000; font-size: 13px;
     }
-    #receipt-print-area img { width: 36mm !important; height: 36mm !important; }
+    #receipt-print-area img { width: 34mm !important; height: 34mm !important; }
     @page { size: auto; margin: 0; }
   }
 </style>
@@ -205,40 +165,165 @@
 <div id="root"></div>
 
 <script>
+// ---------- PWA Service Worker Registration ----------
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => self.clients.claim());
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+
+// ---------- Web Audio & Haptic Feedback ----------
+const playPOSSound = (type) => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === "add") {
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      osc.start(); osc.stop(ctx.currentTime + 0.08);
+    } else if (type === "success") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16);
+      gain.gain.setValueAtTime(0.16, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(); osc.stop(ctx.currentTime + 0.35);
+    } else if (type === "error") {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+      osc.start(); osc.stop(ctx.currentTime + 0.15);
+    }
+  } catch (e) {}
+};
+
+const triggerHaptic = (ms = 12) => {
+  if ("vibrate" in navigator) navigator.vibrate(ms);
+};
+
+// ---------- Pure JS Canvas Confetti Burst ----------
+function triggerCheckoutConfetti() {
+  const canvas = document.createElement("canvas");
+  canvas.style.position = "fixed";
+  canvas.style.top = "0"; canvas.style.left = "0";
+  canvas.style.width = "100vw"; canvas.style.height = "100vh";
+  canvas.style.pointerEvents = "none"; canvas.style.zIndex = "99999";
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+  const particles = Array.from({ length: 55 }, () => ({
+    x: canvas.width / 2, y: canvas.height / 2 + 80,
+    vx: (Math.random() - 0.5) * 14, vy: Math.random() * -15 - 5,
+    size: Math.random() * 7 + 4,
+    color: ["#B85C70", "#D48C9D", "#3B7A57", "#E2D4D8", "#FAD0C4", "#FFD1DC"][Math.floor(Math.random() * 6)],
+    rotation: Math.random() * 360,
+  }));
+
+  let opacity = 1;
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    opacity -= 0.018;
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.42;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, opacity);
+      ctx.fillStyle = p.color;
+      ctx.translate(p.x, p.y);
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+    if (opacity > 0) requestAnimationFrame(loop);
+    else canvas.remove();
+  }
+  loop();
+}
+
+// ---------- Offline-First IndexedDB Engine ----------
+const DB_NAME = "MakaraPOS_DB";
+const DB_VERSION = 1;
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      ["products", "sales", "settings", "stockLog"].forEach(store => {
+        if (!db.objectStoreNames.contains(store)) db.createObjectStore(store);
+      });
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getDBItem(store, key, fallback) {
+  try {
+    const db = await openDB();
+    return new Promise(resolve => {
+      const tx = db.transaction(store, "readonly");
+      const req = tx.objectStore(store).get(key);
+      req.onsuccess = () => resolve(req.result !== undefined ? req.result : fallback);
+      req.onerror = () => resolve(fallback);
+    });
+  } catch { return fallback; }
+}
+
+async function setDBItem(store, key, val) {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, "readwrite");
+      const req = tx.objectStore(store).put(val, key);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+    });
+  } catch { return false; }
+}
+
+// Migration from legacy localStorage into IndexedDB
+async function syncLegacyStorage() {
+  const keys = ["products", "sales", "settings", "stockLog"];
+  for (const k of keys) {
+    const legacy = localStorage.getItem(`acacia_pos_${k}`);
+    if (legacy) {
+      try {
+        await setDBItem(k, "main", JSON.parse(legacy));
+      } catch (e) {}
+    }
+  }
+}
+
 const { useState, useEffect, useMemo, useRef } = React;
 const h = React.createElement;
 
 // ---------- Palette ----------
 const C = {
-  bg: "#F8F5F6",
-  panel: "#FFFFFF",
-  ink: "#1E181A",
-  inkDim: "#786A70",
-  border: "#EDE4E7",
-  borderDark: "#D5C5CA",
-  rose: "#D48C9D",
-  roseDeep: "#B85C70",
-  roseTint: "#F8EBF0",
-  sage: "#3B7A57",
-  sageTint: "#EBF5F0",
-  warn: "#C85A32",
-  warnTint: "#FDF2EE",
+  bg: "#F8F5F6", panel: "#FFFFFF", ink: "#1E181A", inkDim: "#786A70", border: "#EDE4E7",
+  rose: "#D48C9D", roseDeep: "#B85C70", roseTint: "#F8EBF0",
+  sage: "#3B7A57", sageTint: "#EBF5F0", warn: "#C85A32", warnTint: "#FDF2EE",
 };
 
-// ---------- Vector SVG Icon Helper ----------
+// ---------- SVG Vector Icons ----------
 function SvgIcon({ d, size = 16, className = "", color = "currentColor", strokeWidth = 2, children }) {
   return h("svg", {
-    xmlns: "http://www.w3.org/2000/svg",
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: color,
-    strokeWidth: strokeWidth,
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    className: className
-  }, children || (d ? h("path", { d: d }) : null));
+    xmlns: "http://www.w3.org/2000/svg", width: size, height: size, viewBox: "0 0 24 24",
+    fill: "none", stroke: color, strokeWidth: strokeWidth, strokeLinecap: "round", strokeLinejoin: "round", className
+  }, children || (d ? h("path", { d }) : null));
 }
 
 const IconPlus = (p) => h(SvgIcon, { d: "M12 5v14M5 12h14", ...p });
@@ -264,128 +349,125 @@ const IconSheet = (p) => h(SvgIcon, { d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2
 const IconDown = (p) => h(SvgIcon, { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3", ...p });
 const IconUp = (p) => h(SvgIcon, { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12", ...p });
 const IconSparkles = (p) => h(SvgIcon, { d: "m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z", ...p });
+const IconCash = (p) => h(SvgIcon, { d: "M2 6h20v12H2zm4 3h.01M18 15h.01M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", ...p });
 
 // ---------- Translations ----------
 const STRINGS = {
   en: {
     navSales: "Sales", navInventory: "Inventory", navReports: "Reports", navSalesHistory: "Sales History", settings: "Settings",
-    fieldType: "Type", typePlaceholder: "e.g. Skincare, Makeup (optional)", filterAllTypes: "All Categories", colType: "Type",
-    stockCost: "Stock Cost", totalStockValue: "Total Stock Retail Value",
-    salesHistoryTitle: "Sales History", salesHistorySubtitle: "All past completed transactions",
+    fieldType: "Category", typePlaceholder: "e.g. Skincare, Lips", filterAllTypes: "All Categories",
+    stockCost: "Stock Cost", totalStockValue: "Stock Retail Value",
+    salesHistoryTitle: "Sales History", salesHistorySubtitle: "Completed sales transactions",
     noSalesHistoryTitle: "No sales recorded", noSalesHistoryBody: "Completed sales will appear here.",
-    colDate: "Date", colItems: "Items", colTotal: "Total", colStatus: "Status",
-    voided: "Voided", voidSale: "Void", voidConfirmTitle: "Void this sale?",
-    voidConfirmBody: "This restores the sold quantities back to inventory and excludes this sale from revenue. This action cannot be undone.",
+    voided: "Voided", voidSale: "Void Sale", voidConfirmTitle: "Void this sale?",
+    voidConfirmBody: "Restores sold quantities back to inventory and excludes revenue. Cannot be undone.",
     toastSaleVoided: "Sale voided & stock restored",
-    salesTitle: "Sales Desk", addNewItem: "Add new item", searchProducts: "Search products or SKU...",
-    nothingToSellTitle: "Nothing to sell yet", nothingToSellBody: "Add products in Inventory before starting a sale.",
-    outOfStock: "Out of stock", checkout: "Current Checkout", cartEmpty: "Cart is empty. Tap a product to add it.",
+    salesTitle: "Sales Desk", addNewItem: "Add new item", searchProducts: "Search products (F2)...",
+    nothingToSellTitle: "No products available", nothingToSellBody: "Add products in Inventory before starting sales.",
+    outOfStock: "Out of stock", checkout: "Checkout Desk", cartEmpty: "Cart is empty. Tap products to add.",
     colName: "Name", colQty: "Qty", colPrice: "Price", each: "each",
-    discount: "Discount", subtotal: "Subtotal", total: "Total", clear: "Clear Cart", completeSale: "Complete Sale",
+    discount: "Discount", subtotal: "Subtotal", total: "Total", clear: "Clear", completeSale: "Checkout",
     viewCart: "View Cart", item: "item", items: "items",
-    inventoryTitle: "Inventory Management", productsOnFile: "product listed", productsOnFilePl: "products listed",
-    searchNameSku: "Search by name or SKU...", addProduct: "Add Product",
-    noProductsTitle: "No products in inventory", noProductsBody: "Add your first cosmetic SKU with cost, sell price, and photo to track stock.",
+    inventoryTitle: "Inventory Control", productsOnFile: "item listed", productsOnFilePl: "items listed",
+    searchNameSku: "Search name or SKU...", addProduct: "Add Product",
+    noProductsTitle: "No inventory items", noProductsBody: "Add your first product to track stock.",
     noMatch: "No products match", colProduct: "Product", colSku: "SKU", colCost: "Cost", colMargin: "Margin", out: "Out",
-    deleteConfirmTitle: "Delete product", deleteConfirmBody: "This removes it from inventory. Past sales history records remain intact.",
+    deleteConfirmTitle: "Delete product", deleteConfirmBody: "Removes from active inventory. Past sales remain.",
     cancel: "Cancel", delete: "Delete", editProduct: "Edit Product", uploadPhoto: "Upload Photo",
-    jpgPng: "JPG or PNG recommended", removePhoto: "Remove Photo", fieldName: "Product Name",
-    namePlaceholder: "e.g. Rose Velvet Matte Lipstick — #302", fieldSku: "SKU", skuPlaceholder: "Auto-generated if left blank",
-    fieldQty: "Quantity", fieldCost: "Cost ($)", fieldPrice: "Sell Price ($)", marginLabel: "Margin", profitPerUnit: "Profit / unit",
+    jpgPng: "JPG or PNG", removePhoto: "Remove Photo", fieldName: "Product Name",
+    namePlaceholder: "e.g. Rose Matte Lipstick #302", fieldSku: "SKU", skuPlaceholder: "Auto-generated if empty",
+    fieldQty: "Quantity", fieldCost: "Cost ($)", fieldPrice: "Sell Price ($)", marginLabel: "Margin", profitPerUnit: "Profit/unit",
     saveChanges: "Save Changes",
-    reportsTitle: "Analytics & Reports", reportsSubtitle: "Revenue, sold inventory, and profit overview", day: "Day", week: "Week", month: "Month",
-    noSalesTitle: "No sales recorded yet", noSalesBody: "Complete a sale from the Sales desk to view performance reports.",
-    totalRevenue: "Total Revenue", itemsSold: "Items Sold", transactions: "Transactions", revenueBy: "Revenue Performance by",
-    topProducts: "Top Selling Products", colPeriod: "Period", colTransactions: "Transactions", colItemsSold: "Items Sold",
-    colRevenue: "Revenue", colProfit: "Profit", sold: "sold",
-    settingsDataNote: "Inventory & sales data are stored in cloud memory and synchronized across all open instances of this application.",
-    exportBackup: "Export Local Backup JSON", restoreBackup: "Restore Backup File",
-    toastProductAdded: "Product added successfully", toastProductUpdated: "Product updated", toastSaleCompleted: "Sale completed successfully!", toastBackupRestored: "Backup restored successfully",
-
-    receiptTitle: "Receipt Preview", receiptScanToPay: "Scan to pay with QR code", printReceipt: "Print Receipt", closeReceipt: "Close",
-    receiptSaleId: "Receipt", paymentQr: "Payment QR Code", uploadQr: "Upload Payment QR", removeQr: "Remove QR",
-    qrHint: "Shown on checkout and printed receipts", viewReceipt: "View Receipt",
-
-    statusOnline: "Connected", statusSyncing: "Syncing...", statusOffline: "Offline (Local mode)", lastSynced: "Synced",
-
-    lowStockThreshold: "Low Stock Alert Threshold",
-    lowStockThresholdHint: "Products at or below this stock count will be visually flagged.",
-    adjustStock: "Adjust Stock", stockAdjustTitle: "Adjust Inventory Count", stockAdjustReason: "Reason (optional)",
-    stockAdjustReasonPlaceholder: "e.g. Weekly restock, damage adjustment", applyAdjustment: "Apply Adjustment",
-    stockLogTitle: "Stock Adjustment History", noStockLog: "No stock adjustments recorded", viewStockLog: "View Stock Log",
-    stockAdjusted: "Stock count updated",
-
-    exportExcel: "Export Excel", importExcel: "Import Excel",
-    importSummary: "updated, added",
-    importSuccessLabel: "Import Complete",
-
-    setQty: "Set Quantity", tapToChange: "Tap to adjust quantity",
+    reportsTitle: "Analytics Overview", reportsSubtitle: "Revenue, sold items, and profit summary", day: "Day", week: "Week", month: "Month",
+    noSalesTitle: "No sales recorded", noSalesBody: "Complete sales from the Sales desk to see analytics.",
+    totalRevenue: "Total Revenue", itemsSold: "Items Sold", transactions: "Transactions", revenueBy: "Revenue by",
+    topProducts: "Top Products", sold: "sold",
+    settingsDataNote: "Data is synchronized across cloud memory and saved offline in browser IndexedDB.",
+    exportBackup: "Export Backup JSON", restoreBackup: "Restore Backup JSON",
+    toastProductAdded: "Product added", toastProductUpdated: "Product updated", toastSaleCompleted: "Sale completed!", toastBackupRestored: "Backup restored",
+    receiptTitle: "Receipt Preview", printReceipt: "Print Receipt", closeReceipt: "Close",
+    receiptSaleId: "Receipt", paymentQr: "Payment QR Code", uploadQr: "Upload QR", removeQr: "Remove QR",
+    qrHint: "Shown on checkout screen and receipts", viewReceipt: "Receipt",
+    statusOnline: "Connected", statusSyncing: "Syncing...", statusOffline: "Offline (IndexedDB)",
+    lowStockThreshold: "Low Stock Alert Threshold", lowStockThresholdHint: "Products at or below this stock count will be flagged.",
+    adjustStock: "Adjust Stock", stockAdjustTitle: "Adjust Stock Count", stockAdjustReason: "Reason (optional)",
+    stockAdjustReasonPlaceholder: "e.g. Restock, count correction", applyAdjustment: "Apply Adjustment",
+    stockLogTitle: "Stock History Log", noStockLog: "No adjustments recorded", viewStockLog: "Stock History Log", stockAdjusted: "Stock updated",
+    exportExcel: "Export Excel", importExcel: "Import Excel", importSuccessLabel: "Import Complete",
+    exchangeRateLabel: "USD/KHR Rate ($1 = ៛)", payMethod: "Payment Method", cash: "Cash", khqr: "KHQR", card: "Credit Card",
+    amountTendered: "Amount Tendered", changeDue: "Change Due", confirmPayment: "Confirm Payment", shortcutHint: "F2: Search | Esc: Close | Enter: Complete",
   },
   km: {
-    navSales: "លក់", navInventory: "ស្តុកទំនិញ", navReports: "របាយការណ៍", navSalesHistory: "ប្រវត្តិការលក់", settings: "ការកំណត់",
-    fieldType: "ប្រភេទ", typePlaceholder: "ឧ. ថែរក្សាស្បែក, គ្រឿងសំអាង (មិនចាំបាច់)", filterAllTypes: "គ្រប់ប្រភេទ", colType: "ប្រភេទ",
+    navSales: "លក់", navInventory: "ស្តុកទំនិញ", navReports: "របាយការណ៍", navSalesHistory: "ប្រវត្តិលក់", settings: "ការកំណត់",
+    fieldType: "ប្រភេទ", typePlaceholder: "ឧ. ថែរក្សាស្បែក", filterAllTypes: "គ្រប់ប្រភេទ",
     stockCost: "ថ្លៃដើមស្តុក", totalStockValue: "តម្លៃស្តុកសរុប",
-    salesHistoryTitle: "ប្រវត្តិការលក់", salesHistorySubtitle: "ការលក់ទាំងអស់ — លុបចោលមួយ ប្រសិនបើការបញ្ជាទិញត្រូវបានលុបចោល",
-    noSalesHistoryTitle: "មិនទាន់មានការលក់", noSalesHistoryBody: "ការលក់ដែលបានបញ្ចប់នឹងបង្ហាញនៅទីនេះ។",
-    colDate: "កាលបរិច្ឆេទ", colItems: "ទំនិញ", colTotal: "សរុប", colStatus: "ស្ថានភាព",
-    voided: "បានលុបចោល", voidSale: "លុបចោល", voidConfirmTitle: "លុបចោលការលក់នេះ?",
-    voidConfirmBody: "វានឹងស្តារបរិមាណដែលបានលក់ត្រឡប់ទៅស្តុកវិញ ហើយមិនរាប់បញ្ចូលការលក់នេះទៅក្នុងចំណូលទេ។ សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
-    toastSaleVoided: "ការលក់ត្រូវបានលុបចោល ហើយស្តុកត្រូវបានស្តារ",
-    salesTitle: "ការលក់", addNewItem: "បន្ថែមទំនិញថ្មី", searchProducts: "ស្វែងរកទំនិញ",
-    nothingToSellTitle: "មិនទាន់មានទំនិញសម្រាប់លក់", nothingToSellBody: "សូមបន្ថែមទំនិញនៅក្នុងស្តុកមុននឹងចាប់ផ្តើមលក់។",
-    outOfStock: "អស់ស្តុក", checkout: "ការទូទាត់", cartEmpty: "កន្ត្រកទំនេរ។ សូមចុចលើទំនិញដើម្បីបន្ថែម។",
+    salesHistoryTitle: "ប្រវត្តិការលក់", salesHistorySubtitle: "ការលក់ដែលបានបញ្ចប់",
+    noSalesHistoryTitle: "មិនទាន់មានការលក់", noSalesHistoryBody: "ការលក់នឹងបង្ហាញនៅទីនេះ។",
+    voided: "បានលុប", voidSale: "លុបចោល", voidConfirmTitle: "លុបចោលការលក់នេះ?",
+    voidConfirmBody: "វានឹងស្តារស្តុកវិញ និងដកចំណូលចេញ។",
+    toastSaleVoided: "បានលុបការលក់ និងស្តារស្តុក",
+    salesTitle: "ការលក់", addNewItem: "បន្ថែមទំនិញ", searchProducts: "ស្វែងរកទំនិញ (F2)...",
+    nothingToSellTitle: "គ្មានទំនិញសម្រាប់លក់", nothingToSellBody: "សូមបន្ថែមទំនិញក្នុងស្តុកជាមុន។",
+    outOfStock: "អស់ស្តុក", checkout: "ការទូទាត់", cartEmpty: "កន្ត្រកទំនេរ",
     colName: "ឈ្មោះ", colQty: "ចំនួន", colPrice: "តម្លៃ", each: "ក្នុងមួយ",
-    discount: "បញ្ចុះតម្លៃ", subtotal: "សរុបរង", total: "សរុប", clear: "សម្អាត", completeSale: "បញ្ចប់ការលក់",
+    discount: "បញ្ចុះតម្លៃ", subtotal: "សរុបរង", total: "សរុប", clear: "សម្អាត", completeSale: "គិតលុយ",
     viewCart: "មើលកន្ត្រក", item: "ទំនិញ", items: "ទំនិញ",
-    inventoryTitle: "ស្តុកទំនិញ", productsOnFile: "ទំនិញក្នុងបញ្ជី", productsOnFilePl: "ទំនិញក្នុងបញ្ជី",
-    searchNameSku: "ស្វែងរកតាមឈ្មោះ ឬ SKU", addProduct: "បន្ថែមទំនិញ",
-    noProductsTitle: "មិនទាន់មានទំនិញ", noProductsBody: "សូមបន្ថែមទំនិញដំបូងរបស់អ្នក ដោយបញ្ចូលថ្លៃដើម តម្លៃលក់ និងរូបភាព ដើម្បីចាប់ផ្តើមតាមដានស្តុក។",
-    noMatch: "រកមិនឃើញទំនិញដែលត្រូវនឹង", colProduct: "ទំនិញ", colSku: "SKU", colCost: "ថ្លៃដើម", colMargin: "ចំណេញ", out: "អស់",
-    deleteConfirmTitle: "លុប", deleteConfirmBody: "វានឹងលុបចេញពីស្តុក។ ប្រវត្តិការលក់មុនៗនៅតែរក្សាទុក។",
-    cancel: "បោះបង់", delete: "លុប", editProduct: "កែសម្រួលទំនិញ", uploadPhoto: "ផ្ទុករូបភាព",
-    jpgPng: "JPG ឬ PNG (មិនចាំបាច់)", removePhoto: "លុបរូបភាព", fieldName: "ឈ្មោះទំនិញ",
-    namePlaceholder: "ឧ. លាបមាត់ផ្កាកុលាប — ៣០២", fieldSku: "SKU", skuPlaceholder: "បង្កើតដោយស្វ័យប្រវត្តិ ប្រសិនបើទុកទទេ",
-    fieldQty: "បរិមាណ", fieldCost: "ថ្លៃដើម", fieldPrice: "តម្លៃលក់", marginLabel: "ចំណេញ", profitPerUnit: "ចំណេញក្នុងមួយឯកតា",
-    saveChanges: "រក្សាទុកការផ្លាស់ប្តូរ",
-    reportsTitle: "របាយការណ៍", reportsSubtitle: "ទំនិញបានលក់ និងចំណូលតាមកំឡុងពេល", day: "ថ្ងៃ", week: "សប្តាហ៍", month: "ខែ",
-    noSalesTitle: "មិនទាន់មានការលក់ត្រូវបានកត់ត្រា", noSalesBody: "សូមបញ្ចប់ការលក់មួយ រួចរបាយការណ៍របស់អ្នកនឹងបង្ហាញនៅទីនេះ។",
-    totalRevenue: "ចំណូលសរុប", itemsSold: "ទំនិញបានលក់", transactions: "ប្រតិបត្តិការ", revenueBy: "ចំណូលតាម",
-    topProducts: "ទំនិញលក់ដាច់បំផុត", colPeriod: "កំឡុងពេល", colTransactions: "ប្រតិបត្តិការ", colItemsSold: "ទំនិញបានលក់",
-    colRevenue: "ចំណូល", colProfit: "ចំណេញ", sold: "បានលក់",
-    settingsDataNote: "ទិន្នន័យស្តុក និងការលក់ត្រូវបានរក្សាទុកនៅលើប្រព័ន្ធអនឡាញ ហើយចែករំលែករវាងគ្រប់ឧបករណ៍ដែលបើកគេហទំព័រនេះ។",
-    exportBackup: "នាំចេញទិន្នន័យបម្រុង", restoreBackup: "ស្តារទិន្នន័យបម្រុង",
-    toastProductAdded: "បានបន្ថែមទំនិញ", toastProductUpdated: "បានធ្វើបច្ចុប្បន្នភាពទំនិញ", toastSaleCompleted: "ការលក់បានបញ្ចប់", toastBackupRestored: "ទិន្នន័យបម្រុងត្រូវបានស្តារ",
-
-    receiptTitle: "បង្កាន់ដៃ", receiptScanToPay: "ស្កេនដើម្បីទូទាត់", printReceipt: "បោះពុម្ពបង្កាន់ដៃ", closeReceipt: "បិទ",
-    receiptSaleId: "លេខបង្កាន់ដៃ", paymentQr: "កូដ QR ទូទាត់", uploadQr: "ផ្ទុកកូដ QR", removeQr: "លុបកូដ QR",
-    qrHint: "JPG ឬ PNG បង្ហាញនៅលើបង្កាន់ដៃដែលបោះពុម្ព", viewReceipt: "មើលបង្កាន់ដៃ",
-
-    statusOnline: "លើបណ្តាញ", statusSyncing: "កំពុងធ្វើសមកាលកម្ម...", statusOffline: "គ្មានអ៊ីនធឺណិត — រក្សាទុកលើឧបករណ៍នេះ", lastSynced: "បានធ្វើសមកាលកម្ម",
-
-    lowStockThreshold: "កម្រិតស្តុកទាប",
-    lowStockThresholdHint: "ទំនិញដែលមានចំនួនស្មើ ឬតិចជាងនេះ នឹងត្រូវបានសម្គាល់ថាស្តុកទាប។",
-    adjustStock: "កែសម្រួលស្តុក", stockAdjustTitle: "កែសម្រួលស្តុក", stockAdjustReason: "មូលហេតុ (មិនចាំបាច់)",
-    stockAdjustReasonPlaceholder: "ឧ. បន្ថែមស្តុក, កែតម្រូវចំនួន", applyAdjustment: "អនុវត្ត",
-    stockLogTitle: "ប្រវត្តិកែសម្រួលស្តុក", noStockLog: "មិនទាន់មានការកែសម្រួលស្តុក", viewStockLog: "មើលប្រវត្តិស្តុក",
-    stockAdjusted: "ស្តុកត្រូវបានកែសម្រួល",
-
-    exportExcel: "នាំចេញទៅ Excel", importExcel: "នាំចូលពី Excel",
-    importSummary: "បានធ្វើបច្ចុប្បន្នភាព, បន្ថែម",
-    importSuccessLabel: "នាំចូលបានជោគជ័យ",
-
-    setQty: "កំណត់ចំនួន", tapToChange: "ចុចដើម្បីផ្លាស់ប្តូរចំនួន",
-  },
+    inventoryTitle: "ស្តុកទំនិញ", productsOnFile: "ទំនិញ", productsOnFilePl: "ទំនិញ",
+    searchNameSku: "ស្វែងរកឈ្មោះ ឬ SKU...", addProduct: "បន្ថែមទំនិញ",
+    noProductsTitle: "មិនទាន់មានទំនិញ", noProductsBody: "សូមបន្ថែមទំនិញដំបូងរបស់អ្នក។",
+    noMatch: "រកមិនឃើញ", colProduct: "ទំនិញ", colSku: "SKU", colCost: "ថ្លៃដើម", colMargin: "ចំណេញ", out: "អស់",
+    deleteConfirmTitle: "លុបទំនិញ", deleteConfirmBody: "វានឹងលុបចេញពីស្តុក។",
+    cancel: "បោះបង់", delete: "លុប", editProduct: "កែសម្រួល", uploadPhoto: "ផ្ទុករូបភាព",
+    jpgPng: "JPG ឬ PNG", removePhoto: "លុបរូបភាព", fieldName: "ឈ្មោះទំនិញ",
+    namePlaceholder: "ឧ. ក្រែមលាបមាត់ #302", fieldSku: "SKU", skuPlaceholder: "ស្វ័យប្រវត្តិបើទុកទទេ",
+    fieldQty: "បរិមាណ", fieldCost: "ថ្លៃដើម ($)", fieldPrice: "តម្លៃលក់ ($)", marginLabel: "ចំណេញ", profitPerUnit: "ចំណេញ/ឯកតា",
+    saveChanges: "រក្សាទុក",
+    reportsTitle: "របាយការណ៍", reportsSubtitle: "ចំណូល និងប្រាក់ចំណេញ", day: "ថ្ងៃ", week: "សប្តាហ៍", month: "ខែ",
+    noSalesTitle: "មិនទាន់មានការលក់", noSalesBody: "សូមបញ្ចប់ការលក់ដើម្បីមើលរបាយការណ៍។",
+    totalRevenue: "ចំណូលសរុប", itemsSold: "ទំនិញលក់បាន", transactions: "ប្រតិបត្តិការ", revenueBy: "ចំណូលតាម",
+    topProducts: "ទំនិញលក់ដាច់", sold: "លក់បាន",
+    settingsDataNote: "ទិន្នន័យត្រូវបានរក្សាទុកក្នុង IndexedDB និង Sync តាម Cloud។",
+    exportBackup: "នាំចេញទិន្នន័យ (JSON)", restoreBackup: "ស្តារទិន្នន័យ (JSON)",
+    toastProductAdded: "បានបន្ថែមទំនិញ", toastProductUpdated: "បានធ្វើបច្ចុប្បន្នភាព", toastSaleCompleted: "ការលក់បានបញ្ចប់!", toastBackupRestored: "បានស្តារទិន្នន័យ",
+    receiptTitle: "បង្កាន់ដៃ", printReceipt: "បោះពុម្ព", closeReceipt: "បិទ",
+    receiptSaleId: "លេខបង្កាន់ដៃ", paymentQr: "កូដ QR ទូទាត់", uploadQr: "ផ្ទុក QR", removeQr: "លុប QR",
+    qrHint: "បង្ហាញលើបង្កាន់ដៃ", viewReceipt: "បង្កាន់ដៃ",
+    statusOnline: "លើបណ្តាញ", statusSyncing: "កំពុង Sync...", statusOffline: "គ្មានអ៊ីនធឺណិត (IndexedDB)",
+    lowStockThreshold: "កម្រិតស្តុកទាប", lowStockThresholdHint: "ទំនិញតិចជាងនេះនឹងត្រូវបានសម្គាល់។",
+    adjustStock: "កែស្តុក", stockAdjustTitle: "កែសម្រួលស្តុក", stockAdjustReason: "មូលហេតុ (មិនចាំបាច់)",
+    stockAdjustReasonPlaceholder: "ឧ. បន្ថែមស្តុក", applyAdjustment: "អនុវត្ត",
+    stockLogTitle: "ប្រវត្តិកែស្តុក", noStockLog: "គ្មានប្រវត្តិកែស្តុក", viewStockLog: "មើលប្រវត្តិស្តុក", stockAdjusted: "បានធ្វើបច្ចុប្បន្នភាពស្តុក",
+    exportExcel: "នាំចេញ Excel", importExcel: "នាំចូល Excel", importSuccessLabel: "នាំចូលជោគជ័យ",
+    exchangeRateLabel: "អត្រាប្តូរប្រាក់ ($1 = ៛)", payMethod: "វិធីទូទាត់", cash: "សាច់ប្រាក់", khqr: "KHQR", card: "កាតធនាគារ",
+    amountTendered: "ប្រាក់ទទួលបាន", changeDue: "ប្រាក់អាប់", confirmPayment: "អះអាងទូទាត់", shortcutHint: "F2: ស្វែងរក | Esc: បិទ | Enter: គិតលុយ",
+  }
 };
+
 const LangContext = React.createContext("en");
 function useT() {
   const lang = React.useContext(LangContext);
   return (key) => (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
 }
 
-// ---------- Helpers ----------
+// ---------- Currency Format Helpers ----------
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const money = (n) => `$${(Number(n) || 0).toFixed(2)}`;
 const clampQty = (n) => Math.max(0, Math.floor(Number(n) || 0));
+
+const moneyUSD = (n) => `$${(Number(n) || 0).toFixed(2)}`;
+const moneyKHR = (usd, rate = 4100) => `៛${(Math.round(((Number(usd) || 0) * rate) / 100) * 100).toLocaleString()}`;
+
+function dayKey(ts) { return new Date(ts).toISOString().slice(0, 10); }
+function weekKey(ts) {
+  const date = new Date(ts);
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  return `${d.getUTCFullYear()} · Wk ${String(weekNo).padStart(2, "0")}`;
+}
+function monthKey(ts) { return new Date(ts).toLocaleDateString("en-US", { month: "short", year: "numeric" }); }
+const PERIOD_FN = { day: dayKey, week: weekKey, month: monthKey };
 
 function compressImage(file, maxWidth = 420, quality = 0.75) {
   return new Promise((resolve, reject) => {
@@ -409,60 +491,30 @@ function compressImage(file, maxWidth = 420, quality = 0.75) {
   });
 }
 
-function dayKey(ts) { return new Date(ts).toISOString().slice(0, 10); }
-function weekKey(ts) {
-  const date = new Date(ts);
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  return `${d.getUTCFullYear()} · Wk ${String(weekNo).padStart(2, "0")}`;
-}
-function monthKey(ts) { return new Date(ts).toLocaleDateString("en-US", { month: "short", year: "numeric" }); }
-const PERIOD_FN = { day: dayKey, week: weekKey, month: monthKey };
+// ---------- Smooth Animated Numeric Display ----------
+function AnimatedNumber({ value, formatter = moneyUSD, rate = 4100 }) {
+  const [displayVal, setDisplayVal] = useState(value);
+  useEffect(() => {
+    let startTimestamp;
+    const startValue = displayVal;
+    const duration = 220;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setDisplayVal(startValue + (value - startValue) * progress);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [value]);
 
-// ---------- Local & Cloud Storage ----------
-const KEY_PRODUCTS = "acacia_pos_products";
-const KEY_SALES = "acacia_pos_sales";
-const KEY_LANG = "acacia_pos_lang";
-const KEY_SETTINGS = "acacia_pos_settings";
-const KEY_STOCKLOG = "acacia_pos_stocklog";
-const DEFAULT_SETTINGS = { qrCode: "", lowStockThreshold: 5 };
-
-function loadKey(key, fallback) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
-  catch { return fallback; }
-}
-function saveKey(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); }
-  catch (e) { alert("Browser local storage full."); }
+  return h("span", { className: "tabular-nums" }, formatter(displayVal, rate));
 }
 
-const CLOUD_API = "/.netlify/functions/data";
-async function loadCloud() {
-  try {
-    const res = await fetch(CLOUD_API, { cache: "no-store" });
-    if (!res.ok) throw new Error("bad response");
-    return await res.json();
-  } catch (e) { return null; }
-}
-async function saveCloud(products, sales, settings, stockLog) {
-  try {
-    await fetch(CLOUD_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ products, sales, settings, stockLog }),
-    });
-    return true;
-  } catch (e) { return false; }
-}
-
-// ---------- UI Components ----------
+// ---------- Shared UI Components ----------
 function Toast({ message }) {
   if (!message) return null;
   return h("div", {
-    className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-full shadow-xl flex items-center gap-2 z-50 pos-toast-anim border border-white/10",
+    className: "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 z-50 pos-toast-anim border border-white/10",
     style: { background: C.ink, color: "#fff" }
   }, h(IconCheck, { size: 15, color: C.rose }), h("span", { className: "text-xs font-semibold tracking-wide" }, message));
 }
@@ -496,6 +548,75 @@ function SheetShell({ onClose, maxWidth = "max-w-md", children }) {
   );
 }
 
+// ---------- Payment Modal (Cashier Breakdown) ----------
+function PaymentModal({ totalUSD, exchangeRate, onClose, onConfirm }) {
+  const t = useT();
+  const [payMethod, setPayMethod] = useState("cash"); // cash | khqr | card
+  const [tenderedUSD, setTenderedUSD] = useState(totalUSD);
+  const totalKHR = Math.round((totalUSD * exchangeRate) / 100) * 100;
+  const changeUSD = Math.max(0, (Number(tenderedUSD) || 0) - totalUSD);
+  const changeKHR = Math.round((changeUSD * exchangeRate) / 100) * 100;
+
+  const submit = () => {
+    triggerHaptic(20);
+    playPOSSound("success");
+    triggerCheckoutConfetti();
+    onConfirm({
+      paymentMethod: payMethod,
+      tenderedUSD: Number(tenderedUSD) || totalUSD,
+      changeUSD,
+      changeKHR
+    });
+  };
+
+  return h(SheetShell, { onClose, maxWidth: "max-w-md" },
+    h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}`, background: C.roseTint } },
+      h("h2", { className: "font-semibold text-base flex items-center gap-2", style: { color: C.ink } }, h(IconCash, { size: 18, color: C.roseDeep }), t("checkout")),
+      h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
+    h("div", { className: "px-6 py-5 space-y-4 overflow-y-auto flex-1" },
+      
+      // Total Amount Banner (Dual Currency)
+      h("div", { className: "p-4 rounded-2xl text-center shadow-sm border border-gray-100", style: { background: C.bg } },
+        h("div", { className: "text-xs font-bold uppercase tracking-wider mb-1", style: { color: C.inkDim } }, t("total")),
+        h("div", { className: "text-3xl font-black tabular-nums", style: { color: C.roseDeep } }, moneyUSD(totalUSD)),
+        h("div", { className: "text-sm font-semibold tabular-nums mt-0.5", style: { color: C.sage } }, moneyKHR(totalUSD, exchangeRate))),
+
+      // Payment Method Options
+      h(Field, { label: t("payMethod") },
+        h("div", { className: "grid grid-cols-3 gap-2 mt-1" },
+          [
+            { id: "cash", label: t("cash"), icon: IconCash },
+            { id: "khqr", label: t("khqr"), icon: IconQr },
+            { id: "card", label: t("card"), icon: IconDollar },
+          ].map(m => h("button", {
+            key: m.id, onClick: () => { setPayMethod(m.id); triggerHaptic(8); playPOSSound("add"); },
+            className: "py-3 px-2 rounded-xl flex flex-col items-center gap-1.5 text-xs font-bold transition border",
+            style: {
+              background: payMethod === m.id ? C.roseTint : "#fff",
+              borderColor: payMethod === m.id ? C.roseDeep : C.border,
+              color: payMethod === m.id ? C.roseDeep : C.inkDim
+            }
+          }, h(m.icon, { size: 18 }), m.label)))),
+
+      // Cash Calculator Section
+      payMethod === "cash" ? h("div", { className: "p-4 rounded-2xl border border-gray-200 space-y-3", style: { background: "#fff" } },
+        h(Field, { label: t("amountTendered") + " ($)" },
+          h("input", {
+            type: "number", min: "0", step: "0.01", className: "pos-input w-full text-lg font-bold tabular-nums",
+            value: tenderedUSD, onChange: (e) => setTenderedUSD(e.target.value)
+          })),
+        h("div", { className: "flex justify-between items-center text-xs pt-2 border-t border-gray-100" },
+          h("span", { className: "font-semibold", style: { color: C.inkDim } }, t("changeDue")),
+          h("div", { className: "text-right" },
+            h("div", { className: "text-base font-bold tabular-nums", style: { color: C.sage } }, moneyUSD(changeUSD)),
+            h("div", { className: "text-xs font-medium tabular-nums", style: { color: C.inkDim } }, moneyKHR(changeUSD, exchangeRate))))) : null
+    ),
+    h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
+      h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("cancel")),
+      h("button", { onClick: submit, className: "pos-btn-primary py-3 px-6 text-sm font-bold shadow-lg" }, t("confirmPayment")))
+  );
+}
+
 // ---------- Product Modal ----------
 function ProductModal({ initial, onClose, onSave }) {
   const t = useT();
@@ -520,11 +641,10 @@ function ProductModal({ initial, onClose, onSave }) {
 
   const submit = () => {
     if (!canSave) return;
+    triggerHaptic(10); playPOSSound("add");
     onSave({
-      id: initial ? initial.id : uid(),
-      name: name.trim(),
-      sku: sku.trim() || "SKU-" + uid().slice(-6).toUpperCase(),
-      type: type.trim(),
+      id: initial ? initial.id : uid(), name: name.trim(),
+      sku: sku.trim() || "SKU-" + uid().slice(-6).toUpperCase(), type: type.trim(),
       qty: clampQty(qty), cost: Number(cost) || 0, price: Number(price) || 0, photo,
     });
   };
@@ -532,14 +652,14 @@ function ProductModal({ initial, onClose, onSave }) {
   return h(SheetShell, { onClose },
       h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
         h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, initial ? t("editProduct") : t("addProduct")),
-        h("button", { onClick: onClose, className: "p-2 -mr-2 rounded-xl text-gray-400 hover:text-gray-600 transition" }, h(IconX, { size: 18 }))),
+        h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
       h("div", { className: "px-6 py-5 space-y-4 flex-1 overflow-y-auto" },
         h("div", { className: "flex items-center gap-4 p-3 rounded-2xl", style: { background: C.roseTint } },
           h("button", {
             onClick: () => fileRef.current && fileRef.current.click(),
             className: "w-20 h-20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 shadow-sm transition hover:opacity-90",
             style: { background: "#fff", border: `1.5px dashed ${C.rose}` }
-          }, busy ? h("span", { className: "text-xs font-medium" }, "...") : photo ? h("img", { src: photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 24, color: C.roseDeep })),
+          }, busy ? "..." : photo ? h("img", { src: photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 24, color: C.roseDeep })),
           h("div", { className: "text-xs", style: { color: C.inkDim } },
             h("button", { onClick: () => fileRef.current && fileRef.current.click(), className: "font-semibold underline block", style: { color: C.roseDeep } }, t("uploadPhoto")),
             h("div", { className: "mt-0.5 text-[11px]" }, t("jpgPng")),
@@ -554,7 +674,7 @@ function ProductModal({ initial, onClose, onSave }) {
           h(Field, { label: t("fieldPrice") }, h("input", { type: "number", min: "0", step: "0.01", className: "pos-input w-full", value: price, onChange: (e) => setPrice(e.target.value), placeholder: "0.00" }))),
         (cost !== "" && price !== "" && Number(price) > 0) ? h("div", {
           className: "text-xs px-3.5 py-2.5 rounded-xl font-medium flex items-center justify-between shadow-sm", style: { background: C.sageTint, color: C.sage }
-        }, h("span", null, `${t("marginLabel")}: ${(((Number(price) - Number(cost)) / Number(price)) * 100).toFixed(0)}%`), h("span", { className: "font-semibold" }, `${t("profitPerUnit")}: ${money(Number(price) - Number(cost))}`)) : null
+        }, h("span", null, `${t("marginLabel")}: ${(((Number(price) - Number(cost)) / Number(price)) * 100).toFixed(0)}%`), h("span", { className: "font-semibold" }, `${t("profitPerUnit")}: ${moneyUSD(Number(price) - Number(cost))}`)) : null
       ),
       h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
         h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("cancel")),
@@ -575,11 +695,11 @@ function StockAdjustModal({ product, onClose, onApply }) {
     h("div", { className: "px-6 py-5 space-y-4" },
       h("div", { className: "text-sm font-semibold", style: { color: C.ink } }, product.name),
       h("div", { className: "flex items-center justify-center gap-5 py-2" },
-        h("button", { onClick: () => setDelta(d => d - 1), className: "pos-stepper-lg" }, h(IconMinus, { size: 16 })),
+        h("button", { onClick: () => { setDelta(d => d - 1); triggerHaptic(8); playPOSSound("add"); }, className: "pos-stepper-lg" }, h(IconMinus, { size: 16 })),
         h("div", { className: "text-center min-w-[90px]" },
           h("div", { className: "text-3xl font-bold tabular-nums", style: { color: C.roseDeep } }, (delta > 0 ? "+" : "") + delta),
           h("div", { className: "text-xs font-medium tabular-nums mt-0.5", style: { color: C.inkDim } }, `${product.qty} → ${resultQty}`)),
-        h("button", { onClick: () => setDelta(d => d + 1), className: "pos-stepper-lg" }, h(IconPlus, { size: 16 }))),
+        h("button", { onClick: () => { setDelta(d => d + 1); triggerHaptic(8); playPOSSound("add"); }, className: "pos-stepper-lg" }, h(IconPlus, { size: 16 }))),
       h(Field, { label: t("stockAdjustReason") },
         h("input", { className: "pos-input w-full", value: reason, onChange: (e) => setReason(e.target.value), placeholder: t("stockAdjustReasonPlaceholder") }))
     ),
@@ -590,7 +710,7 @@ function StockAdjustModal({ product, onClose, onApply }) {
 }
 
 // ---------- Inventory Page ----------
-function InventoryPage({ products, onAdd, onEdit, onDelete, onAdjustStock, lowStockThreshold, onImportProducts }) {
+function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdjustStock, lowStockThreshold, onImportProducts }) {
   const t = useT();
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -648,39 +768,10 @@ function InventoryPage({ products, onAdd, onEdit, onDelete, onAdjustStock, lowSt
     ) : null,
     h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6 pb-6" },
       products.length === 0 ? h(EmptyState, {
-        icon: IconBox, title: t("noProductsTitle"),
-        body: t("noProductsBody"),
+        icon: IconBox, title: t("noProductsTitle"), body: t("noProductsBody"),
         action: h("button", { onClick: () => setModal("new"), className: "pos-btn-primary flex items-center gap-1.5" }, h(IconPlus, { size: 14 }), t("addProduct"))
       }) : filtered.length === 0 ? h("p", { className: "text-sm text-center py-12 font-medium", style: { color: C.inkDim } }, `${t("noMatch")} "${query}".`)
       : h(React.Fragment, null,
-          // Mobile Card View
-          h("div", { className: "md:hidden space-y-3" }, filtered.map((p, idx) => {
-            const margin = p.price > 0 ? ((p.price - p.cost) / p.price) * 100 : 0;
-            const low = p.qty > 0 && p.qty <= lowStockThreshold;
-            return h("div", { key: p.id, className: "rounded-2xl p-3.5 shadow-sm pos-card-anim", style: { background: C.panel, border: `1px solid ${C.border}`, animationDelay: `${Math.min(idx, 8) * 20}ms` } },
-              h("div", { className: "flex items-center gap-3" },
-                h("div", { className: "w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center shrink-0 border border-gray-100", style: { background: C.bg } }, p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 18, color: C.inkDim })),
-                h("div", { className: "min-w-0 flex-1" },
-                  h("div", { className: "font-semibold text-sm truncate", style: { color: C.ink } }, p.name),
-                  h("div", { className: "text-xs font-mono", style: { color: C.inkDim } }, p.sku)),
-                h("div", { className: "flex items-center gap-1 shrink-0" },
-                  h("button", { onClick: () => setModal(p), className: "p-2 rounded-xl text-gray-500 hover:bg-gray-100" }, h(IconPencil, { size: 15 })),
-                  h("button", { onClick: () => setConfirmDelete(p), className: "p-2 rounded-xl text-rose-500 hover:bg-rose-50" }, h(IconTrash, { size: 15 })))),
-              h("div", { className: "grid grid-cols-4 gap-2 mt-3 pt-3", style: { borderTop: `1px solid ${C.border}` } },
-                h("div", null, h("div", { className: "text-[11px] font-semibold uppercase tracking-wider", style: { color: C.inkDim } }, t("colQty")),
-                  p.qty === 0 ? h("span", { className: "text-[11px] px-1.5 py-0.5 rounded font-semibold inline-block mt-0.5", style: { background: C.warnTint, color: C.warn } }, t("out"))
-                    : h("div", { className: "text-sm tabular-nums font-semibold", style: { color: low ? C.warn : C.ink } }, p.qty)),
-                h("div", null, h("div", { className: "text-[11px] font-semibold uppercase tracking-wider", style: { color: C.inkDim } }, t("colCost")), h("div", { className: "text-sm tabular-nums", style: { color: C.ink } }, money(p.cost))),
-                h("div", null, h("div", { className: "text-[11px] font-semibold uppercase tracking-wider", style: { color: C.inkDim } }, t("colPrice")), h("div", { className: "text-sm tabular-nums font-semibold", style: { color: C.ink } }, money(p.price))),
-                h("div", null, h("div", { className: "text-[11px] font-semibold uppercase tracking-wider", style: { color: C.inkDim } }, t("colMargin")), h("div", { className: "text-sm tabular-nums font-medium", style: { color: C.sage } }, margin.toFixed(0) + "%"))),
-              h("div", { className: "flex items-center justify-between gap-2 mt-3 pt-3", style: { borderTop: `1px solid ${C.border}` } },
-                h("span", { className: "text-xs font-semibold", style: { color: C.inkDim } }, t("adjustStock")),
-                h("div", { className: "flex items-center gap-2" },
-                  h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper-lg" }, h(IconMinus, { size: 14 })),
-                  h("button", { onClick: () => setAdjustTarget(p), className: "px-3 py-1.5 rounded-xl text-xs font-semibold border border-gray-200" }, t("adjustStock")),
-                  h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper-lg" }, h(IconPlus, { size: 14 })))));
-          })),
-          // Desktop Table View
           h("div", { className: "hidden md:block rounded-2xl overflow-hidden shadow-sm border border-gray-200", style: { background: C.panel } },
             h("table", { className: "w-full text-sm" },
               h("thead", null, h("tr", { style: { background: C.roseTint } },
@@ -691,7 +782,7 @@ function InventoryPage({ products, onAdd, onEdit, onDelete, onAdjustStock, lowSt
                 h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colCost")),
                 h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colPrice")),
                 h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colMargin")),
-                h("th", { className: "text-right px-4 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }))),
+                h("th", { className: "text-right px-4 py-3" }))),
               h("tbody", null, filtered.map((p, i) => {
                 const margin = p.price > 0 ? ((p.price - p.cost) / p.price) * 100 : 0;
                 const low = p.qty > 0 && p.qty <= lowStockThreshold;
@@ -700,25 +791,19 @@ function InventoryPage({ products, onAdd, onEdit, onDelete, onAdjustStock, lowSt
                   h("td", { className: "px-3 py-3 font-semibold", style: { color: C.ink } }, p.name),
                   h("td", { className: "px-3 py-3 font-mono text-xs", style: { color: C.inkDim } }, p.sku),
                   h("td", { className: "px-3 py-3 text-right tabular-nums" }, p.qty === 0 ? h("span", { className: "px-2 py-0.5 rounded-full text-xs font-semibold", style: { background: C.warnTint, color: C.warn } }, t("out")) : low ? h("span", { className: "font-semibold px-2 py-0.5 rounded-full text-xs", style: { background: C.warnTint, color: C.warn } }, p.qty) : h("span", { className: "font-medium", style: { color: C.ink } }, p.qty)),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums", style: { color: C.inkDim } }, money(p.cost)),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.ink } }, money(p.price)),
+                  h("td", { className: "px-3 py-3 text-right tabular-nums", style: { color: C.inkDim } }, moneyUSD(p.cost)),
+                  h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.ink } }, moneyUSD(p.price)),
                   h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.sage } }, margin.toFixed(0) + "%"),
                   h("td", { className: "px-4 py-3" }, h("div", { className: "flex items-center justify-end gap-1.5" },
-                    h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper", title: t("adjustStock") }, h(IconMinus, { size: 12 })),
-                    h("button", { onClick: () => setAdjustTarget(p), className: "p-1.5 rounded-lg text-gray-500 hover:bg-gray-100", title: t("adjustStock") }, h(IconBox, { size: 14 })),
-                    h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper", title: t("adjustStock") }, h(IconPlus, { size: 12 })),
+                    h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper" }, h(IconMinus, { size: 12 })),
+                    h("button", { onClick: () => setAdjustTarget(p), className: "p-1.5 rounded-lg text-gray-500 hover:bg-gray-100" }, h(IconBox, { size: 14 })),
+                    h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper" }, h(IconPlus, { size: 12 })),
                     h("button", { onClick: () => setModal(p), className: "p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 ml-1" }, h(IconPencil, { size: 14 })),
                     h("button", { onClick: () => setConfirmDelete(p), className: "p-1.5 rounded-lg text-rose-500 hover:bg-rose-50" }, h(IconTrash, { size: 14 })))));
               }))))
         )),
-    modal ? h(ProductModal, {
-      initial: modal === "new" ? null : modal, onClose: () => setModal(null),
-      onSave: (p) => { modal === "new" ? onAdd(p) : onEdit(p); setModal(null); }
-    }) : null,
-    adjustTarget ? h(StockAdjustModal, {
-      product: adjustTarget, onClose: () => setAdjustTarget(null),
-      onApply: (delta, reason) => { onAdjustStock(adjustTarget, delta, reason); setAdjustTarget(null); }
-    }) : null,
+    modal ? h(ProductModal, { initial: modal === "new" ? null : modal, onClose: () => setModal(null), onSave: (p) => { modal === "new" ? onAdd(p) : onEdit(p); setModal(null); } }) : null,
+    adjustTarget ? h(StockAdjustModal, { product: adjustTarget, onClose: () => setAdjustTarget(null), onApply: (delta, reason) => { onAdjustStock(adjustTarget, delta, reason); setAdjustTarget(null); } }) : null,
     confirmDelete ? h(SheetShell, { onClose: () => setConfirmDelete(null), maxWidth: "max-w-sm" },
       h("div", { className: "p-6", style: { paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" } },
         h("h3", { className: "font-semibold text-base mb-1", style: { color: C.ink } }, `${t("deleteConfirmTitle")} "${confirmDelete.name}"?`),
@@ -729,20 +814,8 @@ function InventoryPage({ products, onAdd, onEdit, onDelete, onAdjustStock, lowSt
   );
 }
 
-// ---------- Quantity Popover ----------
-function QtyPopover({ qty, max, onChange, onClose }) {
-  return h("div", {
-    className: "absolute inset-x-2 bottom-2 rounded-xl flex items-center justify-between px-2 py-1 shadow-xl pos-cart-pulse backdrop-blur-md",
-    style: { background: "rgba(255,255,255,0.96)", border: `1.5px solid ${C.roseDeep}` },
-    onClick: (e) => e.stopPropagation()
-  },
-    h("button", { onClick: () => onChange(Math.max(0, qty - 1)), className: "pos-stepper-lg", style: { width: 32, height: 32 } }, h(IconMinus, { size: 14 })),
-    h("span", { className: "text-sm font-bold tabular-nums", style: { color: C.ink } }, qty),
-    h("button", { onClick: () => onChange(Math.min(max, qty + 1)), disabled: qty >= max, className: "pos-stepper-lg", style: { width: 32, height: 32 } }, h(IconPlus, { size: 14 })));
-}
-
 // ---------- Cart Contents ----------
-function CartContents({ cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, onCheckout, flashId }) {
+function CartContents({ cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout, flashId }) {
   const t = useT();
   return h(React.Fragment, null,
     cart.length > 0 ? h("div", { className: "shrink-0 flex items-center text-[11px] font-bold tracking-wider uppercase pb-2.5 mb-2", style: { color: C.inkDim, borderBottom: `1px solid ${C.border}` } },
@@ -753,12 +826,12 @@ function CartContents({ cart, changeQty, removeItem, discountType, setDiscountTy
           h("button", { onClick: () => removeItem(item.id), className: "w-6 shrink-0 flex items-center justify-center text-gray-400 hover:text-rose-600" }, h(IconTrash, { size: 14 })),
           h("div", { className: "flex-1 min-w-0" },
             h("div", { className: "text-xs font-semibold truncate", style: { color: C.ink } }, item.name),
-            h("div", { className: "text-[11px] tabular-nums", style: { color: C.inkDim } }, `${money(item.price)} ${t("each")}`)),
+            h("div", { className: "text-[11px] tabular-nums", style: { color: C.inkDim } }, `${moneyUSD(item.price)} ${t("each")}`)),
           h("div", { className: "w-20 flex items-center justify-center gap-1 shrink-0" },
             h("button", { onClick: () => changeQty(item.id, -1), className: "pos-stepper" }, h(IconMinus, { size: 10 })),
             h("span", { className: "w-5 text-center text-xs font-semibold tabular-nums", style: { color: C.ink } }, item.qty),
             h("button", { onClick: () => changeQty(item.id, 1), disabled: item.qty >= item.stock, className: "pos-stepper" }, h(IconPlus, { size: 10 }))),
-          h("div", { className: "w-16 text-right text-xs font-semibold tabular-nums shrink-0", style: { color: C.ink } }, money(item.price * item.qty))
+          h("div", { className: "w-16 text-right text-xs font-semibold tabular-nums shrink-0", style: { color: C.ink } }, moneyUSD(item.price * item.qty))
         )))),
     h("div", { className: "shrink-0 space-y-3 pt-3 mt-auto", style: { borderTop: `1px solid ${C.border}` } },
       h("div", { className: "flex items-center gap-2" },
@@ -768,25 +841,29 @@ function CartContents({ cart, changeQty, removeItem, discountType, setDiscountTy
           h("button", { onClick: () => setDiscountType("fixed"), className: "px-2.5 py-1 text-xs font-bold border-l border-gray-200", style: { background: discountType === "fixed" ? C.roseTint : "transparent", color: discountType === "fixed" ? C.roseDeep : C.inkDim } }, h(IconDollar, { size: 12 }))),
         h("input", { type: "number", min: "0", step: "0.01", inputMode: "decimal", value: discountValue, onChange: (e) => setDiscountValue(e.target.value), className: "pos-input flex-1 text-right py-1.5 text-xs font-medium", placeholder: "0" })),
       h("div", { className: "space-y-1.5" },
-        h("div", { className: "flex justify-between text-xs tabular-nums" }, h("span", { style: { color: C.inkDim } }, t("subtotal")), h("span", { className: "font-medium", style: { color: C.ink } }, money(subtotal))),
-        h("div", { className: "flex justify-between text-xs tabular-nums" }, h("span", { style: { color: C.inkDim } }, t("discount")), h("span", { className: "font-medium", style: { color: discountAmount > 0 ? C.warn : C.inkDim } }, discountAmount > 0 ? "-" + money(discountAmount) : money(0))),
-        h("div", { className: "flex justify-between text-base font-bold tabular-nums pt-2 mt-1", style: { borderTop: `1px dashed ${C.border}` } }, h("span", { style: { color: C.ink } }, t("total")), h("span", { style: { color: C.roseDeep } }, money(total)))),
+        h("div", { className: "flex justify-between text-xs tabular-nums" }, h("span", { style: { color: C.inkDim } }, t("subtotal")), h("span", { className: "font-medium", style: { color: C.ink } }, moneyUSD(subtotal))),
+        h("div", { className: "flex justify-between text-xs tabular-nums" }, h("span", { style: { color: C.inkDim } }, t("discount")), h("span", { className: "font-medium", style: { color: discountAmount > 0 ? C.warn : C.inkDim } }, discountAmount > 0 ? "-" + moneyUSD(discountAmount) : moneyUSD(0))),
+        h("div", { className: "flex justify-between items-baseline pt-2 mt-1", style: { borderTop: `1px dashed ${C.border}` } },
+          h("span", { className: "text-base font-bold", style: { color: C.ink } }, t("total")),
+          h("div", { className: "text-right" },
+            h("div", { className: "text-lg font-black", style: { color: C.roseDeep } }, h(AnimatedNumber, { value: total, formatter: moneyUSD })),
+            h("div", { className: "text-xs font-semibold", style: { color: C.sage } }, h(AnimatedNumber, { value: total, formatter: moneyKHR, rate: exchangeRate }))))),
       h("div", { className: "flex gap-2 pt-1" },
         h("button", { onClick: () => cart.forEach(i => removeItem(i.id)), disabled: cart.length === 0, className: "pos-btn-ghost shrink-0 border border-gray-200", style: { opacity: cart.length === 0 ? 0.4 : 1 } }, t("clear")),
-        h("button", { onClick: onCheckout, disabled: cart.length === 0, className: "pos-btn-primary flex-1 py-3 text-sm flex items-center justify-center gap-2 shadow-lg", style: { opacity: cart.length === 0 ? 0.4 : 1 } }, h("span", null, t("completeSale")), h(IconChevron, { size: 16 }))))
+        h("button", { onClick: onOpenCheckout, disabled: cart.length === 0, className: "pos-btn-primary flex-1 py-3 text-sm flex items-center justify-center gap-2 shadow-lg", style: { opacity: cart.length === 0 ? 0.4 : 1 } }, h("span", null, t("completeSale")), h(IconChevron, { size: 16 }))))
   );
 }
 
 // ---------- Sales Page ----------
-function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
+function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddProduct }) {
   const t = useT();
   const [query, setQuery] = useState("");
   const [discountType, setDiscountType] = useState("percent");
   const [discountValue, setDiscountValue] = useState(0);
   const [cartOpen, setCartOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [quickAdd, setQuickAdd] = useState(false);
   const [typeFilter, setTypeFilter] = useState("");
-  const [expandedId, setExpandedId] = useState(null);
   const [flashId, setFlashId] = useState(null);
   const [cartPulse, setCartPulse] = useState(false);
 
@@ -799,7 +876,8 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
   const flashItem = (id) => { setFlashId(id); setTimeout(() => setFlashId(null), 600); };
 
   const addToCart = (p) => {
-    if (p.qty <= 0) return;
+    if (p.qty <= 0) { triggerHaptic(30); playPOSSound("error"); return; }
+    triggerHaptic(10); playPOSSound("add");
     setCart(prev => {
       const existing = prev.find(c => c.id === p.id);
       if (existing) { if (existing.qty >= p.qty) return prev; return prev.map(c => c.id === p.id ? { ...c, qty: c.qty + 1 } : c); }
@@ -808,18 +886,10 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
     pulseCart(); flashItem(p.id);
   };
 
-  const setCartQty = (p, qty) => {
-    setCart(prev => {
-      const clamped = clampQty(Math.min(qty, p.qty));
-      if (clamped <= 0) return prev.filter(c => c.id !== p.id);
-      const existing = prev.find(c => c.id === p.id);
-      if (existing) return prev.map(c => c.id === p.id ? { ...c, qty: clamped } : c);
-      return [...prev, { id: p.id, name: p.name, price: p.price, cost: p.cost, qty: clamped, stock: p.qty }];
-    });
-    pulseCart();
+  const changeQty = (id, delta) => {
+    triggerHaptic(8); playPOSSound("add");
+    setCart(prev => prev.map(c => c.id === id ? { ...c, qty: clampQty(Math.min(c.qty + delta, c.stock)) } : c).filter(c => c.qty > 0));
   };
-
-  const changeQty = (id, delta) => setCart(prev => prev.map(c => c.id === id ? { ...c, qty: clampQty(Math.min(c.qty + delta, c.stock)) } : c).filter(c => c.qty > 0));
   const removeItem = (id) => setCart(prev => prev.filter(c => c.id !== id));
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
@@ -827,13 +897,12 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
   const total = Math.max(subtotal - discountAmount, 0);
   const itemCount = cart.reduce((s, i) => s + i.qty, 0);
 
-  const handleCheckout = () => {
-    if (cart.length === 0) return;
-    onCheckout({ cart, subtotal, discountAmount, total });
-    setCart([]); setDiscountValue(0); setCartOpen(false);
+  const finalizeSale = (paymentDetails) => {
+    onCheckout({ cart, subtotal, discountAmount, total, paymentDetails });
+    setCart([]); setDiscountValue(0); setCartOpen(false); setPaymentModalOpen(false);
   };
 
-  const cartProps = { cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, onCheckout: handleCheckout, flashId };
+  const cartProps = { cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout: () => setPaymentModalOpen(true), flashId };
 
   return h("div", { className: "flex flex-col md:flex-row h-full pos-page-anim max-w-7xl mx-auto w-full" },
     h("div", { className: "flex-1 flex flex-col min-w-0" },
@@ -844,7 +913,7 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
         h("div", { className: "flex items-center gap-2" },
           h("div", { className: "relative flex-1" },
             h("span", { className: "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" }, h(IconSearch, { size: 14 })),
-            h("input", { value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchProducts"), className: "pos-input pos-input-search w-full max-w-sm shadow-sm" })),
+            h("input", { id: "pos-search-input", value: query, onChange: (e) => setQuery(e.target.value), placeholder: t("searchProducts"), className: "pos-input pos-input-search w-full max-w-sm shadow-sm" })),
           h("button", { onClick: () => setQuickAdd(true), className: "md:hidden p-2.5 rounded-xl shrink-0 border border-gray-200 shadow-sm", style: { background: C.roseTint, color: C.roseDeep } }, h(IconPlus, { size: 16 }))),
         types.length > 0 ? h("div", { className: "mt-2.5" },
           h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full max-w-sm" },
@@ -856,27 +925,26 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
         : h("div", { className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4" },
             filtered.map((p, idx) => {
               const inCart = (cart.find(c => c.id === p.id) || {}).qty || 0;
-              const disabled = p.qty <= 0;
-              const isExpanded = expandedId === p.id;
-              return h("div", { key: p.id, className: "relative pos-card-anim", style: { animationDelay: `${Math.min(idx, 10) * 15}ms` } },
+              return h("div", { key: p.id, className: "pos-card-anim" },
                 h("button", {
-                  onClick: () => { if (inCart > 0) { setExpandedId(isExpanded ? null : p.id); } else { addToCart(p); } },
-                  disabled, className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between", style: { opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
+                  onClick: () => addToCart(p),
+                  disabled: p.qty <= 0, className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between relative overflow-hidden", style: { opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
                 },
                   h("div", { className: "w-full aspect-square rounded-xl overflow-hidden mb-2.5 flex items-center justify-center relative border border-gray-100", style: { background: C.bg } },
                     p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 22, color: C.inkDim }),
-                    (inCart > 0 && !isExpanded) ? h("span", {
+                    inCart > 0 ? h("span", {
                       className: "absolute top-2 right-2 min-w-[22px] h-5 px-1.5 rounded-full flex items-center justify-center text-xs font-bold shadow-md" + (cartPulse ? " pos-cart-pulse" : ""),
-                      style: { background: C.roseDeep, color: "#fff" }, title: t("tapToChange")
+                      style: { background: C.roseDeep, color: "#fff" }
                     }, inCart) : null,
-                    p.qty <= 0 ? h("span", { className: "absolute inset-x-0 bottom-0 text-center text-[10px] py-1 font-bold uppercase tracking-wider backdrop-blur-sm", style: { background: "rgba(200,90,50,0.85)", color: "#fff" } }, t("outOfStock")) : null,
-                    isExpanded ? h(QtyPopover, { qty: inCart, max: p.qty, onChange: (q) => setCartQty(p, q) }) : null),
+                    p.qty <= 0 ? h("span", { className: "absolute inset-x-0 bottom-0 text-center text-[10px] py-1 font-bold uppercase tracking-wider backdrop-blur-sm", style: { background: "rgba(200,90,50,0.85)", color: "#fff" } }, t("outOfStock")) : null),
                   h("div", { className: "text-xs font-semibold leading-snug line-clamp-2 mb-1", style: { color: C.ink } }, p.name),
-                  h("div", { className: "text-sm font-bold tabular-nums mt-auto", style: { color: C.roseDeep } }, money(p.price))));
+                  h("div", { className: "mt-auto" },
+                    h("div", { className: "text-sm font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(p.price)),
+                    h("div", { className: "text-[10px] font-semibold tabular-nums opacity-80", style: { color: C.sage } }, moneyKHR(p.price, exchangeRate)))));
             }))
       )),
 
-    // Desktop Side Panel Cart
+    // Desktop Cart Panel
     h("div", { className: "hidden md:flex md:w-80 lg:w-96 flex-col shrink-0 my-5 mr-6 rounded-2xl shadow-sm overflow-hidden border border-gray-200", style: { background: C.panel } },
       h("div", { className: "px-5 py-4 flex items-center justify-between", style: { borderBottom: `1px solid ${C.border}`, background: C.roseTint } },
         h("h2", { className: "font-semibold text-sm flex items-center gap-2", style: { color: C.ink } }, h(IconCart, { size: 16, color: C.roseDeep }), t("checkout")),
@@ -884,13 +952,13 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
       h("div", { className: "flex-1 flex flex-col px-5 py-4 min-h-0" }, h(CartContents, cartProps))
     ),
 
-    // Mobile Bottom Floating Cart Button
+    // Mobile Bottom Cart Floating Bar
     (cart.length > 0 && !cartOpen) ? h("button", {
       onClick: () => setCartOpen(true),
       className: "md:hidden fixed left-4 right-4 z-30 rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-2xl" + (cartPulse ? " pos-cart-pulse" : ""),
       style: { bottom: "calc(1rem + env(safe-area-inset-bottom))", background: C.roseDeep, color: "#fff" }
     },
-      h("span", { className: "flex items-center gap-2 text-sm font-bold" }, h(IconCart, { size: 16 }), `${itemCount} ${itemCount === 1 ? t("item") : t("items")} · ${money(total)}`),
+      h("span", { className: "flex items-center gap-2 text-sm font-bold" }, h(IconCart, { size: 16 }), `${itemCount} ${t("items")} · ${moneyUSD(total)}`),
       h("span", { className: "text-xs font-bold flex items-center gap-1 uppercase tracking-wider bg-white/20 px-3 py-1 rounded-xl" }, t("viewCart"), h(IconChevron, { size: 14 }))
     ) : null,
 
@@ -907,12 +975,13 @@ function SalesPage({ products, cart, setCart, onCheckout, onAddProduct }) {
       )
     ) : null,
 
+    paymentModalOpen ? h(PaymentModal, { totalUSD: total, exchangeRate, onClose: () => setPaymentModalOpen(false), onConfirm: finalizeSale }) : null,
     quickAdd ? h(ProductModal, { onClose: () => setQuickAdd(false), onSave: (p) => { onAddProduct(p); setQuickAdd(false); } }) : null
   );
 }
 
 // ---------- Reports Page ----------
-function ReportsPage({ sales, products }) {
+function ReportsPage({ sales, products, exchangeRate }) {
   const t = useT();
   const [period, setPeriod] = useState("day");
 
@@ -952,27 +1021,27 @@ function ReportsPage({ sales, products }) {
       h("div", null,
         h("h1", { className: "text-xl font-bold tracking-tight", style: { color: C.ink } }, t("reportsTitle")),
         h("p", { className: "text-xs font-medium", style: { color: C.inkDim } }, t("reportsSubtitle"))),
-      h("div", { className: "flex rounded-xl p-1 shadow-inner border border-gray-200", style: { background: C.roseTint } },
+      h("div", { className: "flex rounded-xl p-1 border border-gray-200 shadow-inner", style: { background: C.roseTint } },
         ["day", "week", "month"].map(p => h("button", {
           key: p, onClick: () => setPeriod(p),
           className: "px-3.5 py-1.5 text-xs font-bold rounded-lg transition",
-          style: { background: period === p ? "#fff" : "transparent", color: period === p ? C.roseDeep : C.inkDim, boxShadow: period === p ? "0 1px 3px rgba(0,0,0,0.06)" : "none" }
+          style: { background: period === p ? "#fff" : "transparent", color: period === p ? C.roseDeep : C.inkDim }
         }, periodLabels[p])))),
     h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6 pb-6" },
       h("div", { className: "grid grid-cols-2 gap-3.5 mb-5" },
-        h(StatCard, { label: t("stockCost"), value: money(stockCost), color: C.warn, icon: IconBox }),
-        h(StatCard, { label: t("totalStockValue"), value: money(stockValue), color: C.sage, icon: IconDollar })),
+        h(StatCard, { label: t("stockCost"), value: moneyUSD(stockCost), subValue: moneyKHR(stockCost, exchangeRate), color: C.warn, icon: IconBox }),
+        h(StatCard, { label: t("totalStockValue"), value: moneyUSD(stockValue), subValue: moneyKHR(stockValue, exchangeRate), color: C.sage, icon: IconDollar })),
       activeSales.length === 0 ? h(EmptyState, { icon: IconChart, title: t("noSalesTitle"), body: t("noSalesBody") })
       : h(React.Fragment, null,
           h("div", { className: "grid grid-cols-3 gap-3.5 mb-5" },
-            h(StatCard, { label: t("totalRevenue"), value: money(totals.revenue), color: C.roseDeep, icon: IconTrend }),
+            h(StatCard, { label: t("totalRevenue"), value: moneyUSD(totals.revenue), subValue: moneyKHR(totals.revenue, exchangeRate), color: C.roseDeep, icon: IconTrend }),
             h(StatCard, { label: t("itemsSold"), value: totals.items, color: C.sage, icon: IconCart }),
             h(StatCard, { label: t("transactions"), value: totals.tx, color: C.ink, icon: IconChart })),
           h("div", { className: "rounded-2xl p-5 mb-5 shadow-sm border border-gray-200", style: { background: C.panel } },
             h("h3", { className: "text-xs font-bold tracking-wider uppercase mb-4", style: { color: C.inkDim } }, `${t("revenueBy")} ${periodLabels[period]}${chartData.length > 0 ? ` (${chartData.length})` : ""}`),
             h("div", { className: "flex items-end gap-2 pt-2", style: { height: 180 } },
-              chartData.map(g => h("div", { key: g.key, className: "flex-1 flex flex-col items-center justify-end h-full group relative", title: `${g.key}: ${money(g.revenue)}` },
-                h("div", { className: "text-[10px] font-bold mb-1 tabular-nums opacity-80 group-hover:opacity-100", style: { color: C.inkDim } }, g.revenue > 0 ? money(g.revenue).replace("$", "") : ""),
+              chartData.map(g => h("div", { key: g.key, className: "flex-1 flex flex-col items-center justify-end h-full group relative", title: `${g.key}: ${moneyUSD(g.revenue)}` },
+                h("div", { className: "text-[10px] font-bold mb-1 tabular-nums opacity-80 group-hover:opacity-100", style: { color: C.inkDim } }, g.revenue > 0 ? moneyUSD(g.revenue).replace("$", "") : ""),
                 h("div", { style: { width: "100%", maxWidth: 36, height: `${Math.max(6, (g.revenue / maxRevenue) * 140)}px`, background: "linear-gradient(180deg, #D48C9D 0%, #B85C70 100%)", borderRadius: "6px 6px 0 0" } }),
                 h("div", { className: "text-[10px] font-medium mt-2 text-center truncate w-full", style: { color: C.inkDim } }, g.key))))),
           h("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-5" },
@@ -980,36 +1049,37 @@ function ReportsPage({ sales, products }) {
               h("table", { className: "w-full text-sm" },
                 h("thead", null, h("tr", { style: { background: C.roseTint } },
                   h("th", { className: "text-left px-4 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colPeriod")),
-                  h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colTransactions")),
-                  h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colItemsSold")),
-                  h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colRevenue")),
-                  h("th", { className: "text-right px-4 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colProfit")))),
+                  h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("transactions")),
+                  h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("itemsSold")),
+                  h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("totalRevenue")),
+                  h("th", { className: "text-right px-4 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("marginLabel")))),
                 h("tbody", null, grouped.map((g, i) => h("tr", { key: g.key, style: { borderTop: i === 0 ? "none" : `1px solid ${C.border}` } },
                   h("td", { className: "px-4 py-3 font-semibold text-xs", style: { color: C.ink } }, g.key),
                   h("td", { className: "px-3 py-3 text-right tabular-nums text-xs", style: { color: C.inkDim } }, g.transactions),
                   h("td", { className: "px-3 py-3 text-right tabular-nums text-xs", style: { color: C.inkDim } }, g.itemsSold),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums text-xs font-semibold", style: { color: C.ink } }, money(g.revenue)),
-                  h("td", { className: "px-4 py-3 text-right tabular-nums text-xs font-semibold", style: { color: C.sage } }, money(g.revenue - g.cost))))))),
+                  h("td", { className: "px-3 py-3 text-right tabular-nums text-xs font-semibold", style: { color: C.ink } }, moneyUSD(g.revenue)),
+                  h("td", { className: "px-4 py-3 text-right tabular-nums text-xs font-semibold", style: { color: C.sage } }, moneyUSD(g.revenue - g.cost))))))),
             h("div", { className: "rounded-2xl p-5 shadow-sm border border-gray-200", style: { background: C.panel } },
               h("h3", { className: "text-xs font-bold tracking-wider uppercase mb-3.5 flex items-center gap-1.5", style: { color: C.inkDim } }, h(IconTrend, { size: 14, color: C.roseDeep }), t("topProducts")),
               h("div", { className: "space-y-3" }, topProducts.map((p, i) => h("div", { key: i, className: "flex items-center justify-between text-xs pb-2 border-b border-gray-100 last:border-none" },
                 h("div", { className: "min-w-0 pr-2" }, h("div", { className: "truncate font-semibold", style: { color: C.ink } }, p.name), h("div", { className: "text-[11px]", style: { color: C.inkDim } }, `${p.qty} ${t("sold")}`)),
-                h("div", { className: "tabular-nums font-bold shrink-0", style: { color: C.roseDeep } }, money(p.revenue)))))))
+                h("div", { className: "tabular-nums font-bold shrink-0", style: { color: C.roseDeep } }, moneyUSD(p.revenue)))))))
         )
     )
   );
 }
 
-function StatCard({ label, value, color, icon }) {
+function StatCard({ label, value, subValue, color, icon }) {
   return h("div", { className: "rounded-2xl p-4 shadow-sm border border-gray-200 flex items-center justify-between", style: { background: C.panel } },
     h("div", null,
       h("div", { className: "text-[11px] font-bold tracking-wider uppercase mb-1", style: { color: C.inkDim } }, label),
-      h("div", { className: "text-xl font-extrabold tabular-nums", style: { color } }, value)),
+      h("div", { className: "text-xl font-extrabold tabular-nums", style: { color } }, value),
+      subValue ? h("div", { className: "text-xs font-semibold tabular-nums mt-0.5", style: { color: C.inkDim } }, subValue) : null),
     icon ? h("div", { className: "p-2.5 rounded-xl", style: { background: C.roseTint } }, h(icon, { size: 18, color: C.roseDeep })) : null);
 }
 
 // ---------- Sales History Page ----------
-function SalesHistoryPage({ sales, onVoid, onViewReceipt }) {
+function SalesHistoryPage({ sales, exchangeRate, onVoid, onViewReceipt }) {
   const t = useT();
   const [confirmVoid, setConfirmVoid] = useState(null);
   const sorted = useMemo(() => [...sales].sort((a, b) => b.timestamp - a.timestamp), [sales]);
@@ -1032,7 +1102,9 @@ function SalesHistoryPage({ sales, onVoid, onViewReceipt }) {
                 h("div", { className: "text-xs font-semibold", style: { color: C.ink } }, fmtDate(sale.timestamp)),
                 h("div", { className: "text-xs mt-1 line-clamp-2", style: { color: C.inkDim } }, itemsSummary)),
               h("div", { className: "flex items-center gap-3 shrink-0" },
-                h("div", { className: "text-sm font-bold tabular-nums", style: { color: C.roseDeep } }, money(sale.total)),
+                h("div", { className: "text-right" },
+                  h("div", { className: "text-sm font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(sale.total)),
+                  h("div", { className: "text-xs font-semibold tabular-nums", style: { color: C.sage } }, moneyKHR(sale.total, exchangeRate))),
                 sale.voided
                   ? h("span", { className: "text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider", style: { background: C.warnTint, color: C.warn } }, t("voided"))
                   : h("button", {
@@ -1055,7 +1127,7 @@ function SalesHistoryPage({ sales, onVoid, onViewReceipt }) {
 }
 
 // ---------- Receipt Modal ----------
-function ReceiptModal({ sale, qrCode, onClose }) {
+function ReceiptModal({ sale, qrCode, exchangeRate, onClose }) {
   const t = useT();
   const fmtDate = (ts) => new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
   const receiptId = "#" + sale.id.slice(-8).toUpperCase();
@@ -1078,15 +1150,16 @@ function ReceiptModal({ sale, qrCode, onClose }) {
         sale.items.map((it, i) => h("div", { key: i, style: { marginBottom: 4 } },
           h("div", { style: { fontWeight: 600 } }, it.name),
           h("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 11 } },
-            h("span", null, `${it.qty} × ${money(it.price)}`),
-            h("span", null, money(it.qty * it.price))))),
+            h("span", null, `${it.qty} × ${moneyUSD(it.price)}`),
+            h("span", null, moneyUSD(it.qty * it.price))))),
         h("div", { style: { borderTop: "1px dashed #999", margin: "8px 0" } }),
-        h("div", { style: { display: "flex", justifyContent: "space-between" } }, h("span", null, t("subtotal")), h("span", null, money(sale.subtotal))),
-        h("div", { style: { display: "flex", justifyContent: "space-between" } }, h("span", null, t("discount")), h("span", null, sale.discountAmount > 0 ? "-" + money(sale.discountAmount) : money(0))),
-        h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 13, marginTop: 6 } }, h("span", null, t("total")), h("span", null, money(sale.total))),
+        h("div", { style: { display: "flex", justifyContent: "space-between" } }, h("span", null, t("subtotal")), h("span", null, moneyUSD(sale.subtotal))),
+        h("div", { style: { display: "flex", justifyContent: "space-between" } }, h("span", null, t("discount")), h("span", null, sale.discountAmount > 0 ? "-" + moneyUSD(sale.discountAmount) : moneyUSD(0))),
+        h("div", { style: { display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 13, marginTop: 6 } }, h("span", null, t("total")), h("span", null, moneyUSD(sale.total))),
+        h("div", { style: { display: "flex", justifyContent: "space-between", fontSize: 11, color: "#444" } }, h("span", null, "Total (KHR)"), h("span", null, moneyKHR(sale.total, exchangeRate))),
         qrCode ? h("div", { style: { textAlign: "center", marginTop: 12 } },
           h("img", { src: qrCode, style: { width: 110, height: 110, objectFit: "contain", margin: "0 auto" } }),
-          h("div", { style: { marginTop: 4, fontSize: 10 } }, t("receiptScanToPay"))) : null
+          h("div", { style: { marginTop: 4, fontSize: 10 } }, "Scan KHQR to Pay")) : null
       )),
     h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
       h("button", { onClick: onClose, className: "pos-btn-ghost" }, t("closeReceipt")),
@@ -1122,6 +1195,7 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
   const qrFileRef = useRef(null);
   const [qrBusy, setQrBusy] = useState(false);
   const [threshold, setThreshold] = useState(settings.lowStockThreshold);
+  const [exchangeRate, setExchangeRate] = useState(settings.exchangeRate || 4100);
   const [logOpen, setLogOpen] = useState(false);
 
   const exportData = () => {
@@ -1141,7 +1215,7 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
       try {
         const data = JSON.parse(reader.result);
         if (!Array.isArray(data.products) || !Array.isArray(data.sales)) throw new Error("bad file");
-        if (confirm("Restore this backup file? It will replace all local inventory and sales data.")) { onImport(data); onClose(); }
+        if (confirm("Restore this backup file?")) { onImport(data); onClose(); }
       } catch { alert("Invalid backup file."); }
     };
     reader.readAsText(file);
@@ -1158,9 +1232,10 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
     } finally { setQrBusy(false); }
   };
 
-  const commitThreshold = () => {
+  const commitSettings = () => {
     const n = Math.max(0, Math.floor(Number(threshold) || 0));
-    onSaveSettings({ ...settings, lowStockThreshold: n });
+    const r = Math.max(1000, Math.floor(Number(exchangeRate) || 4100));
+    onSaveSettings({ ...settings, lowStockThreshold: n, exchangeRate: r });
   };
 
   return h(SheetShell, { onClose },
@@ -1168,6 +1243,13 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
         h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("settings")),
         h("button", { onClick: onClose, className: "p-2 -mr-2 text-gray-400 hover:text-gray-600" }, h(IconX, { size: 18 }))),
       h("div", { className: "px-6 py-5 space-y-5 flex-1 overflow-y-auto" },
+
+        // Currency Exchange Rate Setting
+        h("div", { className: "p-4 rounded-2xl border border-gray-200" },
+          h(Field, { label: t("exchangeRateLabel") },
+            h("div", { className: "flex items-center gap-2 mt-1" },
+              h("input", { type: "number", min: "1000", step: "50", className: "pos-input flex-1 text-xs font-semibold tabular-nums", value: exchangeRate, onChange: (e) => setExchangeRate(e.target.value), onBlur: commitSettings }),
+              h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border border-gray-200" }, t("saveChanges"))))),
 
         // QR Code Section
         h("div", { className: "p-4 rounded-2xl border border-gray-200", style: { background: C.roseTint } },
@@ -1188,17 +1270,17 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
         h("div", { className: "p-4 rounded-2xl border border-gray-200" },
           h(Field, { label: t("lowStockThreshold") },
             h("div", { className: "flex items-center gap-2 mt-1" },
-              h("input", { type: "number", min: "0", step: "1", className: "pos-input w-24 text-xs font-semibold", value: threshold, onChange: (e) => setThreshold(e.target.value), onBlur: commitThreshold }),
-              h("button", { onClick: commitThreshold, className: "pos-btn-ghost text-xs border border-gray-200" }, t("saveChanges")))),
+              h("input", { type: "number", min: "0", step: "1", className: "pos-input w-24 text-xs font-semibold", value: threshold, onChange: (e) => setThreshold(e.target.value), onBlur: commitSettings }),
+              h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border border-gray-200" }, t("saveChanges")))),
           h("p", { className: "text-[11px] mt-2", style: { color: C.inkDim } }, t("lowStockThresholdHint")),
           h("button", { onClick: () => setLogOpen(true), className: "text-xs mt-3 font-semibold underline block", style: { color: C.roseDeep } }, t("viewStockLog"))),
 
-        // Data Management
+        // Data Backup
         h("div", { className: "p-4 rounded-2xl border border-gray-200" },
           h("p", { className: "text-xs mb-3 leading-relaxed", style: { color: C.inkDim } }, t("settingsDataNote")),
-          h("button", { onClick: exportData, className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border border-gray-200 transition hover:bg-gray-50", style: { color: C.ink } },
+          h("button", { onClick: exportData, className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border border-gray-200 transition hover:bg-gray-50" },
             h("span", null, t("exportBackup")), h(IconDown, { size: 14, color: C.sage })),
-          h("button", { onClick: () => fileRef.current && fileRef.current.click(), className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border border-gray-200 mt-2 transition hover:bg-gray-50", style: { color: C.ink } },
+          h("button", { onClick: () => fileRef.current && fileRef.current.click(), className: "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between border border-gray-200 mt-2 transition hover:bg-gray-50" },
             h("span", null, t("restoreBackup")), h(IconUp, { size: 14, color: C.roseDeep })),
           h("input", { ref: fileRef, type: "file", accept: "application/json", className: "hidden", onChange: handleFile }))
       ),
@@ -1206,17 +1288,17 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
   );
 }
 
-// ---------- Main App ----------
+// ---------- Main App Container ----------
 function App() {
-  const [products, setProducts] = useState(() => loadKey(KEY_PRODUCTS, []));
-  const [sales, setSales] = useState(() => loadKey(KEY_SALES, []));
-  const [settings, setSettings] = useState(() => ({ ...DEFAULT_SETTINGS, ...loadKey(KEY_SETTINGS, {}) }));
-  const [stockLog, setStockLog] = useState(() => loadKey(KEY_STOCKLOG, []));
+  const [products, setProducts] = useState([]);
+  const [sales, setSales] = useState([]);
+  const [settings, setSettings] = useState({ exchangeRate: 4100, lowStockThreshold: 5, qrCode: "" });
+  const [stockLog, setStockLog] = useState([]);
   const [cart, setCart] = useState([]);
   const [page, setPage] = useState("sales");
   const [toast, setToast] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [lang, setLang] = useState(() => loadKey(KEY_LANG, "en"));
+  const [lang, setLang] = useState("en");
   const [cloudStatus, setCloudStatus] = useState("syncing");
   const [now, setNow] = useState(() => Date.now());
   const [lastSale, setLastSale] = useState(null);
@@ -1224,68 +1306,82 @@ function App() {
 
   const t = (key) => (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
 
+  // Load IndexedDB on Mount
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      await syncLegacyStorage();
+      const p = await getDBItem("products", "main", []);
+      const s = await getDBItem("sales", "main", []);
+      const set = await getDBItem("settings", "main", { exchangeRate: 4100, lowStockThreshold: 5, qrCode: "" });
+      const log = await getDBItem("stockLog", "main", []);
+      if (active) {
+        setProducts(p); setSales(s); setSettings(set); setStockLog(log);
+        setCloudStatus("online");
+      }
+    })();
+    return () => { active = false; };
+  }, []);
+
+  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "F2") {
+        e.preventDefault();
+        document.getElementById("pos-search-input")?.focus();
+      } else if (e.key === "Escape") {
+        if (settingsOpen) setSettingsOpen(false);
+        else if (lastSale) setLastSale(null);
+        else if (viewSale) setViewSale(null);
+        else if (cart.length > 0) { setCart([]); playPOSSound("error"); }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [settingsOpen, lastSale, viewSale, cart]);
+
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    loadCloud().then((data) => {
-      if (cancelled) return;
-      if (data && Array.isArray(data.products) && Array.isArray(data.sales)) {
-        const cloudSettings = { ...DEFAULT_SETTINGS, ...(data.settings || {}) };
-        const cloudStockLog = Array.isArray(data.stockLog) ? data.stockLog : [];
-        setProducts(data.products); setSales(data.sales); setSettings(cloudSettings); setStockLog(cloudStockLog);
-        saveKey(KEY_PRODUCTS, data.products); saveKey(KEY_SALES, data.sales);
-        saveKey(KEY_SETTINGS, cloudSettings); saveKey(KEY_STOCKLOG, cloudStockLog);
-        setCloudStatus("online");
-      } else {
-        setCloudStatus("offline");
-      }
-    });
-    return () => { cancelled = true; };
-  }, []);
-
-  const persist = (nextProducts, nextSales, nextSettings, nextStockLog) => {
-    saveKey(KEY_PRODUCTS, nextProducts);
-    saveKey(KEY_SALES, nextSales);
-    saveKey(KEY_SETTINGS, nextSettings);
-    saveKey(KEY_STOCKLOG, nextStockLog);
-    saveCloud(nextProducts, nextSales, nextSettings, nextStockLog).then(ok => setCloudStatus(ok ? "online" : "offline"));
+  const persist = async (nextProducts, nextSales, nextSettings, nextStockLog) => {
+    setProducts(nextProducts); setSales(nextSales); setSettings(nextSettings); setStockLog(nextStockLog);
+    await setDBItem("products", "main", nextProducts);
+    await setDBItem("sales", "main", nextSales);
+    await setDBItem("settings", "main", nextSettings);
+    await setDBItem("stockLog", "main", nextStockLog);
   };
 
-  const changeLang = (l) => { setLang(l); saveKey(KEY_LANG, l); };
+  const changeLang = (l) => setLang(l);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 2200); };
 
-  const addProduct = (p) => { const next = [...products, p]; setProducts(next); persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); };
-  const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); setProducts(next); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); };
-  const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); setProducts(next); persist(next, sales, settings, stockLog); setCart(c => c.filter(x => x.id !== id)); };
+  const addProduct = (p) => { const next = [...products, p]; persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); };
+  const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); };
+  const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); persist(next, sales, settings, stockLog); setCart(c => c.filter(x => x.id !== id)); };
 
   const adjustStock = (product, delta, reason) => {
     if (!delta) return;
     const nextProducts = products.map(p => p.id === product.id ? { ...p, qty: clampQty(p.qty + delta) } : p);
     const entry = { id: uid(), timestamp: Date.now(), productId: product.id, productName: product.name, delta, reason: (reason || "").trim() };
     const nextLog = [...stockLog, entry];
-    setProducts(nextProducts); setStockLog(nextLog);
     persist(nextProducts, sales, settings, nextLog);
     showToast(t("stockAdjusted"));
   };
 
   const saveSettings = (nextSettings) => {
-    setSettings(nextSettings);
     persist(products, sales, nextSettings, stockLog);
   };
 
   const importProducts = (rows) => {
-    let updated = 0, added = 0, skipped = 0;
+    let updated = 0, added = 0;
     let nextProducts = [...products];
     for (const row of rows) {
       const name = String(row.Name || row.name || "").trim();
       const qty = Number(row.Qty ?? row.qty ?? 0);
       const cost = Number(row.Cost ?? row.cost ?? 0);
       const price = Number(row.Price ?? row.price ?? 0);
-      if (!name || qty < 0 || cost < 0 || price < 0 || Number.isNaN(qty) || Number.isNaN(cost) || Number.isNaN(price)) { skipped++; continue; }
+      if (!name || qty < 0 || cost < 0 || price < 0) continue;
       const sku = String(row.SKU || row.sku || "").trim();
       const type = String(row.Type || row.type || "").trim();
       const idx = sku ? nextProducts.findIndex(p => p.sku === sku) : -1;
@@ -1297,16 +1393,14 @@ function App() {
         added++;
       }
     }
-    setProducts(nextProducts);
     persist(nextProducts, sales, settings, stockLog);
     showToast(`${t("importSuccessLabel")}: ${updated} updated, ${added} added`);
   };
 
-  const handleCheckout = ({ cart: items, subtotal, discountAmount, total }) => {
-    const sale = { id: uid(), timestamp: Date.now(), items: items.map(i => ({ productId: i.id, name: i.name, qty: i.qty, price: i.price, cost: i.cost })), subtotal, discountAmount, total, voided: false };
-    const nextSales = [...sales, sale]; setSales(nextSales);
+  const handleCheckout = ({ cart: items, subtotal, discountAmount, total, paymentDetails }) => {
+    const sale = { id: uid(), timestamp: Date.now(), items: items.map(i => ({ productId: i.id, name: i.name, qty: i.qty, price: i.price, cost: i.cost })), subtotal, discountAmount, total, paymentDetails, voided: false };
+    const nextSales = [...sales, sale];
     const nextProducts = products.map(p => { const bought = items.find(i => i.id === p.id); return bought ? { ...p, qty: Math.max(0, p.qty - bought.qty) } : p; });
-    setProducts(nextProducts);
     persist(nextProducts, nextSales, settings, stockLog);
     showToast(t("toastSaleCompleted"));
     setLastSale(sale);
@@ -1320,18 +1414,8 @@ function App() {
       return line ? { ...p, qty: (Number(p.qty) || 0) + line.qty } : p;
     });
     const nextSales = sales.map(s => s.id === saleId ? { ...s, voided: true } : s);
-    setProducts(nextProducts);
-    setSales(nextSales);
     persist(nextProducts, nextSales, settings, stockLog);
     showToast(t("toastSaleVoided"));
-  };
-
-  const handleImport = (data) => {
-    const nextSettings = { ...DEFAULT_SETTINGS, ...(data.settings || {}) };
-    const nextLog = Array.isArray(data.stockLog) ? data.stockLog : [];
-    setProducts(data.products); setSales(data.sales); setSettings(nextSettings); setStockLog(nextLog);
-    persist(data.products, data.sales, nextSettings, nextLog);
-    showToast(t("toastBackupRestored"));
   };
 
   const NAV = [
@@ -1341,18 +1425,15 @@ function App() {
     { id: "salesHistory", label: t("navSalesHistory"), icon: IconTrend },
   ];
 
-  const statusColor = cloudStatus === "online" ? C.sage : cloudStatus === "syncing" ? "#D9B86A" : C.warn;
-  const statusLabel = cloudStatus === "online" ? t("statusOnline") : cloudStatus === "syncing" ? t("statusSyncing") : t("statusOffline");
   const clockStr = new Date(now).toLocaleString(lang === "km" ? "km-KH" : "en-US", { hour: "numeric", minute: "2-digit" });
 
   return h(LangContext.Provider, { value: lang },
   h("div", { className: "w-full min-h-screen flex flex-col", style: { background: C.bg } },
 
-    // Luxury Header Navbar
+    // Header Navbar
     h("header", { className: "w-full shadow-lg shrink-0 border-b border-white/10 z-30", style: { background: C.ink, color: "#fff" } },
       h("div", { className: "max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 sm:px-6 py-3" },
         
-        // Brand Title
         h("div", { className: "flex items-center gap-2.5 min-w-0 shrink-0" },
           h("div", { className: "p-2 rounded-xl shadow-inner", style: { background: "rgba(252, 235, 240, 0.12)" } },
             h(IconSparkles, { size: 18, color: C.rose })),
@@ -1360,35 +1441,28 @@ function App() {
             h("div", { className: "brand-font text-base sm:text-lg font-semibold tracking-wider text-white truncate" }, "MAKARA"),
             h("div", { className: "text-[9px] uppercase tracking-widest font-bold opacity-60 text-pink-100" }, "Cosmetics POS"))),
 
-        // Navigation Controls
         h("nav", { className: "hidden md:flex items-center gap-1.5 p-1 rounded-2xl border border-white/10", style: { background: "rgba(255,255,255,0.05)" } },
           NAV.map(n => {
             const active = page === n.id;
             return h("button", {
-              key: n.id, onClick: () => setPage(n.id),
+              key: n.id, onClick: () => { setPage(n.id); triggerHaptic(8); playPOSSound("add"); },
               className: "pos-nav-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-wide transition-all",
               style: { background: active ? C.roseDeep : "transparent", color: active ? "#fff" : "rgba(255,255,255,0.7)" }
             }, h(n.icon, { size: 14 }), h("span", null, n.label));
           })),
 
-        // Utility Tray
         h("div", { className: "flex items-center gap-2 shrink-0" },
-          
-          // Live Clock
           h("div", { className: "hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-1 rounded-full border border-white/10 bg-white/5 opacity-80" },
             h(IconClock, { size: 12, color: C.rose }), h("span", null, clockStr)),
 
-          // Cloud Status Pill
-          h("div", { className: "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wider border border-white/10 bg-white/5", title: statusLabel },
-            h("span", { className: "w-2 h-2 rounded-full shrink-0 animate-pulse", style: { background: statusColor } }),
-            h("span", { className: "hidden lg:inline opacity-80" }, statusLabel)),
+          h("div", { className: "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wider border border-white/10 bg-white/5" },
+            h("span", { className: "w-2 h-2 rounded-full shrink-0 animate-pulse", style: { background: C.sage } }),
+            h("span", { className: "hidden lg:inline opacity-80" }, t("statusOffline"))),
 
-          // Language Selector
           h("div", { className: "flex rounded-xl overflow-hidden text-xs font-bold border border-white/10 bg-white/5 p-0.5" },
             h("button", { onClick: () => changeLang("en"), className: "px-2 py-0.5 rounded-lg transition", style: { background: lang === "en" ? C.roseDeep : "transparent", color: "#fff" } }, "EN"),
             h("button", { onClick: () => changeLang("km"), className: "px-2 py-0.5 rounded-lg transition", style: { background: lang === "km" ? C.roseDeep : "transparent", color: "#fff" } }, "ខ្មែរ")),
 
-          // Settings Gear
           h("button", {
             onClick: () => setSettingsOpen(true),
             className: "pos-nav-btn flex items-center justify-center w-8 h-8 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition",
@@ -1397,29 +1471,30 @@ function App() {
         )
       ),
 
-      // Mobile Bottom Nav Bar
       h("div", { className: "md:hidden flex items-center justify-around px-2 py-1.5 border-t border-white/10 bg-black/20" },
         NAV.map(n => {
           const active = page === n.id;
           return h("button", {
-            key: n.id, onClick: () => setPage(n.id),
+            key: n.id, onClick: () => { setPage(n.id); triggerHaptic(8); playPOSSound("add"); },
             className: "flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-[10px] font-medium transition",
             style: { color: active ? C.rose : "rgba(255,255,255,0.6)" }
           }, h(n.icon, { size: 16 }), h("span", null, n.label));
         }))
     ),
 
-    // Page Content Container
+    // Keyboard Shortcuts Bar
+    h("div", { className: "w-full bg-pink-950/20 text-center py-1 text-[11px] font-mono opacity-60 hidden md:block" }, t("shortcutHint")),
+
+    // Main Content Area
     h("main", { className: "flex-1 min-w-0" },
-      page === "inventory" ? h(InventoryPage, { products, onAdd: addProduct, onEdit: editProduct, onDelete: deleteProduct, onAdjustStock: adjustStock, lowStockThreshold: settings.lowStockThreshold, onImportProducts: importProducts }) : null,
-      page === "sales" ? h(SalesPage, { products, cart, setCart, onCheckout: handleCheckout, onAddProduct: addProduct }) : null,
-      page === "reports" ? h(ReportsPage, { sales, products }) : null,
-      page === "salesHistory" ? h(SalesHistoryPage, { sales, onVoid: voidSale, onViewReceipt: setViewSale }) : null),
+      page === "inventory" ? h(InventoryPage, { products, exchangeRate: settings.exchangeRate || 4100, onAdd: addProduct, onEdit: editProduct, onDelete: deleteProduct, onAdjustStock: adjustStock, lowStockThreshold: settings.lowStockThreshold, onImportProducts: importProducts }) : null,
+      page === "sales" ? h(SalesPage, { products, cart, setCart, exchangeRate: settings.exchangeRate || 4100, onCheckout: handleCheckout, onAddProduct: addProduct }) : null,
+      page === "reports" ? h(ReportsPage, { sales, products, exchangeRate: settings.exchangeRate || 4100 }) : null,
+      page === "salesHistory" ? h(SalesHistoryPage, { sales, exchangeRate: settings.exchangeRate || 4100, onVoid: voidSale, onViewReceipt: setViewSale }) : null),
     
-    // Modal Renderers
-    settingsOpen ? h(SettingsSheet, { products, sales, settings, onSaveSettings: saveSettings, stockLog, onImport: handleImport, onClose: () => setSettingsOpen(false) }) : null,
-    lastSale ? h(ReceiptModal, { sale: lastSale, qrCode: settings.qrCode, onClose: () => setLastSale(null) }) : null,
-    viewSale ? h(ReceiptModal, { sale: viewSale, qrCode: settings.qrCode, onClose: () => setViewSale(null) }) : null,
+    settingsOpen ? h(SettingsSheet, { products, sales, settings, onSaveSettings: saveSettings, stockLog, onImport: (d) => { setProducts(d.products); setSales(d.sales); }, onClose: () => setSettingsOpen(false) }) : null,
+    lastSale ? h(ReceiptModal, { sale: lastSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setLastSale(null) }) : null,
+    viewSale ? h(ReceiptModal, { sale: viewSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setViewSale(null) }) : null,
     h(Toast, { message: toast })
   ));
 }
