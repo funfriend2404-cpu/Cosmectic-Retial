@@ -315,7 +315,8 @@ const IconMoon = (p) => h(SvgIcon, { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 2
 const STRINGS = {
   en: {
     navSales: "Sales", navInventory: "Inventory", navReports: "Reports", navSalesHistory: "Sales History", settings: "Settings",
-    fieldType: "Category", typePlaceholder: "e.g. Skincare, Lips", filterAllTypes: "All Categories",
+    fieldBrand: "Brand", brandPlaceholder: "e.g. Dior, MAC, Chanel", filterAllBrands: "All Brands",
+    fieldType: "Category", typePlaceholder: "e.g. Skincare, Lips",
     stockCost: "Stock Cost", totalStockValue: "Stock Retail Value",
     salesHistoryTitle: "Sales History", salesHistorySubtitle: "Completed sales transactions",
     noSalesHistoryTitle: "No sales recorded", noSalesHistoryBody: "Completed sales will appear here.",
@@ -359,7 +360,8 @@ const STRINGS = {
   },
   km: {
     navSales: "លក់", navInventory: "ស្តុកទំនិញ", navReports: "របាយការណ៍", navSalesHistory: "ប្រវត្តិលក់", settings: "ការកំណត់",
-    fieldType: "ប្រភេទ", typePlaceholder: "ឧ. ថែរក្សាស្បែក", filterAllTypes: "គ្រប់ប្រភេទ",
+    fieldBrand: "យីហោ (Brand)", brandPlaceholder: "ឧ. Dior, MAC, Chanel", filterAllBrands: "គ្រប់យីហោ",
+    fieldType: "ប្រភេទ", typePlaceholder: "ឧ. ថែរក្សាស្បែក",
     stockCost: "ថ្លៃដើមស្តុក", totalStockValue: "តម្លៃស្តុកសរុប",
     salesHistoryTitle: "ប្រវត្តិការលក់", salesHistorySubtitle: "ការលក់ដែលបានបញ្ចប់",
     noSalesHistoryTitle: "មិនទាន់មានការលក់", noSalesHistoryBody: "ការលក់នឹងបង្ហាញនៅទីនេះ។",
@@ -575,6 +577,7 @@ function ProductModal({ initial, onClose, onSave }) {
   const C = THEMES[theme];
   const [name, setName] = useState(initial ? initial.name : "");
   const [sku, setSku] = useState(initial ? initial.sku : "");
+  const [brand, setBrand] = useState(initial ? initial.brand || "" : "");
   const [type, setType] = useState(initial ? initial.type || "" : "");
   const [qty, setQty] = useState(initial ? initial.qty : 0);
   const [cost, setCost] = useState(initial ? initial.cost : "");
@@ -597,7 +600,7 @@ function ProductModal({ initial, onClose, onSave }) {
     triggerHaptic(10); playPOSSound("add");
     onSave({
       id: initial ? initial.id : uid(), name: name.trim(),
-      sku: sku.trim() || "SKU-" + uid().slice(-6).toUpperCase(), type: type.trim(),
+      sku: sku.trim() || "SKU-" + uid().slice(-6).toUpperCase(), brand: brand.trim(), type: type.trim(),
       qty: clampQty(qty), cost: Number(cost) || 0, price: Number(price) || 0, photo,
     });
   };
@@ -622,6 +625,7 @@ function ProductModal({ initial, onClose, onSave }) {
           h("input", { ref: fileRef, type: "file", accept: "image/*", className: "hidden", onChange: handleFile })),
         h(Field, { label: t("fieldName") }, h("input", { className: "pos-input w-full", style: inputStyle, value: name, onChange: (e) => setName(e.target.value), placeholder: t("namePlaceholder") })),
         h(Field, { label: t("fieldSku") }, h("input", { className: "pos-input w-full", style: inputStyle, value: sku, onChange: (e) => setSku(e.target.value), placeholder: t("skuPlaceholder") })),
+        h(Field, { label: t("fieldBrand") }, h("input", { className: "pos-input w-full", style: inputStyle, value: brand, onChange: (e) => setBrand(e.target.value), placeholder: t("brandPlaceholder") })),
         h(Field, { label: t("fieldType") }, h("input", { className: "pos-input w-full", style: inputStyle, value: type, onChange: (e) => setType(e.target.value), placeholder: t("typePlaceholder") })),
         h("div", { className: "grid grid-cols-3 gap-3" },
           h(Field, { label: t("fieldQty") }, h("input", { type: "number", min: "0", step: "1", className: "pos-input w-full", style: inputStyle, value: qty, onChange: (e) => setQty(e.target.value) })),
@@ -683,19 +687,19 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
   const [query, setQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
+  const [brandFilter, setBrandFilter] = useState("");
   const [modal, setModal] = useState(null);
   const [adjustTarget, setAdjustTarget] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const importRef = useRef(null);
 
-  const types = useMemo(() => Array.from(new Set(products.map(p => (p.type || "").trim()).filter(Boolean))).sort(), [products]);
+  const brands = useMemo(() => Array.from(new Set(products.map(p => (p.brand || "").trim()).filter(Boolean))).sort(), [products]);
   const filtered = products.filter(p =>
     (p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase())) &&
-    (typeFilter === "" || (p.type || "") === typeFilter));
+    (brandFilter === "" || (p.brand || "") === brandFilter));
 
   const exportExcel = () => {
-    const rows = products.map(p => ({ Name: p.name, SKU: p.sku, Type: p.type || "", Qty: p.qty, Cost: p.cost, Price: p.price }));
+    const rows = products.map(p => ({ Name: p.name, SKU: p.sku, Brand: p.brand || "", Type: p.type || "", Qty: p.qty, Cost: p.cost, Price: p.price }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Products");
@@ -733,10 +737,10 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
         h("button", { onClick: () => importRef.current && importRef.current.click(), className: "pos-btn-ghost flex items-center gap-1.5 shadow-sm border", style: { borderColor: C.border, color: C.ink } }, h(IconUp, { size: 14, color: C.roseDeep }), h("span", { className: "hidden xs:inline" }, t("importExcel"))),
         h("input", { ref: importRef, type: "file", accept: ".xlsx,.xls,.csv", className: "hidden", onChange: handleImportFile }),
         h("button", { onClick: () => setModal("new"), className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff" } }, h(IconPlus, { size: 14, className: "mr-1.5" }), h("span", { className: "hidden xs:inline" }, t("addProduct"))))),
-    types.length > 0 ? h("div", { className: "px-4 sm:px-6 pb-3" },
-      h("select", { value: typeFilter, onChange: (e) => setTypeFilter(e.target.value), className: "pos-input w-full sm:w-56", style: inputStyle },
-        h("option", { value: "" }, t("filterAllTypes")),
-        types.map(ty => h("option", { key: ty, value: ty }, ty)))
+    brands.length > 0 ? h("div", { className: "px-4 sm:px-6 pb-3" },
+      h("select", { value: brandFilter, onChange: (e) => setBrandFilter(e.target.value), className: "pos-input w-full sm:w-56", style: inputStyle },
+        h("option", { value: "" }, t("filterAllBrands")),
+        brands.map(b => h("option", { key: b, value: b }, b)))
     ) : null,
     h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6 pb-6" },
       products.length === 0 ? h(EmptyState, {
@@ -760,7 +764,7 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
                 const low = p.qty > 0 && p.qty <= lowStockThreshold;
                 return h("tr", { key: p.id, className: "transition-colors", style: { borderTop: i === 0 ? "none" : `1px solid ${C.border}` } },
                   h("td", { className: "px-4 py-3" }, h("div", { className: "w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border", style: { background: C.inputBg, borderColor: C.border } }, p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 16, color: C.inkDim }))),
-                  h("td", { className: "px-3 py-3 font-semibold", style: { color: C.ink } }, p.name),
+                  h("td", { className: "px-3 py-3 font-semibold", style: { color: C.ink } }, h("div", null, p.name), p.brand ? h("div", { className: "text-[11px] font-normal opacity-70" }, p.brand) : null),
                   h("td", { className: "px-3 py-3 font-mono text-xs", style: { color: C.inkDim } }, p.sku),
                   h("td", { className: "px-3 py-3 text-right tabular-nums" }, p.qty === 0 ? h("span", { className: "px-2 py-0.5 rounded-full text-xs font-semibold", style: { background: C.warnTint, color: C.warn } }, t("out")) : low ? h("span", { className: "font-semibold px-2 py-0.5 rounded-full text-xs", style: { background: C.warnTint, color: C.warn } }, p.qty) : h("span", { className: "font-medium", style: { color: C.ink } }, p.qty)),
                   h("td", { className: "px-3 py-3 text-right tabular-nums", style: { color: C.inkDim } }, moneyUSD(p.cost)),
@@ -839,16 +843,16 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   const [cartOpen, setCartOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [quickAdd, setQuickAdd] = useState(false);
-  const [typeFilter, setTypeFilter] = useState("");
+  const [brandFilter, setBrandFilter] = useState("");
   const [flashId, setFlashId] = useState(null);
   const [cartPulse, setCartPulse] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const searchInputRef = useRef(null);
 
-  const types = useMemo(() => Array.from(new Set(products.map(p => (p.type || "").trim()).filter(Boolean))).sort(), [products]);
+  const brands = useMemo(() => Array.from(new Set(products.map(p => (p.brand || "").trim()).filter(Boolean))).sort(), [products]);
   const filtered = products.filter(p =>
     (p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase())) &&
-    (typeFilter === "" || (p.type || "") === typeFilter));
+    (brandFilter === "" || (p.brand || "") === brandFilter));
 
   const pulseCart = () => { setCartPulse(true); setTimeout(() => setCartPulse(false), 300); };
   const flashItem = (id) => { setFlashId(id); setTimeout(() => setFlashId(null), 600); };
@@ -893,35 +897,32 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
     h("div", { className: "flex-1 flex flex-col min-w-0" },
       h("div", { className: "px-4 sm:px-6 pt-5 pb-3 space-y-3" },
         
-        // Header Title & Add Item Button
         h("div", { className: "hidden md:flex items-center justify-between" },
           h("h1", { className: "text-xl font-bold tracking-tight", style: { color: C.ink } }, t("salesTitle")),
           h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border", style: { borderColor: C.border, color: C.ink } }, h(IconPlus, { size: 14, color: C.roseDeep }), t("addNewItem"))),
 
-        // Brand / Category Filter Pills (Visible on top of search bar)
-        types.length > 0 ? h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
+        brands.length > 0 ? h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
           h("button", {
-            onClick: () => { setTypeFilter(""); triggerHaptic(6); playPOSSound("add"); },
+            onClick: () => { setBrandFilter(""); triggerHaptic(6); playPOSSound("add"); },
             className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
             style: {
-              background: typeFilter === "" ? C.roseDeep : C.inputBg,
-              borderColor: typeFilter === "" ? C.roseDeep : C.border,
-              color: typeFilter === "" ? "#fff" : C.inkDim
+              background: brandFilter === "" ? C.roseDeep : C.inputBg,
+              borderColor: brandFilter === "" ? C.roseDeep : C.border,
+              color: brandFilter === "" ? "#fff" : C.inkDim
             }
-          }, t("filterAllTypes")),
-          types.map(ty => h("button", {
-            key: ty,
-            onClick: () => { setTypeFilter(ty); triggerHaptic(6); playPOSSound("add"); },
+          }, t("filterAllBrands")),
+          brands.map(b => h("button", {
+            key: b,
+            onClick: () => { setBrandFilter(b); triggerHaptic(6); playPOSSound("add"); },
             className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
             style: {
-              background: typeFilter === ty ? C.roseDeep : C.inputBg,
-              borderColor: typeFilter === ty ? C.roseDeep : C.border,
-              color: typeFilter === ty ? "#fff" : C.inkDim
+              background: brandFilter === b ? C.roseDeep : C.inputBg,
+              borderColor: brandFilter === b ? C.roseDeep : C.border,
+              color: brandFilter === b ? "#fff" : C.inkDim
             }
-          }, ty))
+          }, b))
         ) : null,
 
-        // Search Bar & Quick Add (Expandable Search Icon)
         h("div", { className: "flex items-center justify-between gap-2" },
           h("div", { className: "relative flex items-center transition-all duration-300", style: { width: searchExpanded ? "100%" : "42px", maxWidth: searchExpanded ? "380px" : "42px" } },
             searchExpanded ? h(React.Fragment, null,
@@ -964,7 +965,8 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
                       style: { background: C.roseDeep, color: "#fff" }
                     }, inCart) : null,
                     p.qty <= 0 ? h("span", { className: "absolute inset-x-0 bottom-0 text-center text-[10px] py-1 font-bold uppercase tracking-wider backdrop-blur-sm", style: { background: "rgba(200,90,50,0.85)", color: "#fff" } }, t("outOfStock")) : null),
-                  h("div", { className: "text-xs font-semibold leading-snug line-clamp-2 mb-1", style: { color: C.ink } }, p.name),
+                  h("div", { className: "text-xs font-semibold leading-snug line-clamp-2 mb-0.5", style: { color: C.ink } }, p.name),
+                  p.brand ? h("div", { className: "text-[10px] font-medium opacity-70 mb-1" }, p.brand) : null,
                   h("div", { className: "mt-auto" },
                     h("div", { className: "text-sm font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(p.price)),
                     h("div", { className: "text-[10px] font-semibold tabular-nums opacity-80", style: { color: C.sage } }, moneyKHR(p.price, exchangeRate)))));
@@ -1412,13 +1414,14 @@ function App() {
       const price = Number(row.Price ?? row.price ?? 0);
       if (!name || qty < 0 || cost < 0 || price < 0) continue;
       const sku = String(row.SKU || row.sku || "").trim();
+      const brand = String(row.Brand || row.brand || "").trim();
       const type = String(row.Type || row.type || "").trim();
       const idx = sku ? nextProducts.findIndex(p => p.sku === sku) : -1;
       if (idx >= 0) {
-        nextProducts[idx] = { ...nextProducts[idx], name, type, qty: clampQty(qty), cost, price };
+        nextProducts[idx] = { ...nextProducts[idx], name, brand, type, qty: clampQty(qty), cost, price };
         updated++;
       } else {
-        nextProducts.push({ id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), type, qty: clampQty(qty), cost, price, photo: "" });
+        nextProducts.push({ id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), brand, type, qty: clampQty(qty), cost, price, photo: "" });
         added++;
       }
     }
