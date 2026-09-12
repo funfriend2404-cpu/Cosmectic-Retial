@@ -687,7 +687,7 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
   const [query, setQuery] = useState("");
-  const [brandFilter, setBrandFilter] = useState("");
+  const [brandFilter, setBrandFilter] = useState("All");
   const [modal, setModal] = useState(null);
   const [adjustTarget, setAdjustTarget] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -696,7 +696,7 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
   const brands = useMemo(() => Array.from(new Set(products.map(p => (p.brand || "").trim()).filter(Boolean))).sort(), [products]);
   const filtered = products.filter(p => {
     const matchesQuery = p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase());
-    if (brandFilter === "") return matchesQuery;
+    if (brandFilter === "All") return matchesQuery;
     if (brandFilter === "Unassigned") return matchesQuery && !p.brand;
     return matchesQuery && (p.brand || "") === brandFilter;
   });
@@ -742,8 +742,8 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
         h("button", { onClick: () => setModal("new"), className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff" } }, h(IconPlus, { size: 14, className: "mr-1.5" }), h("span", { className: "hidden xs:inline" }, t("addProduct"))))),
     h("div", { className: "px-4 sm:px-6 pb-3" },
       h("select", { value: brandFilter, onChange: (e) => setBrandFilter(e.target.value), className: "pos-input w-full sm:w-56", style: inputStyle },
-        h("option", { value: "" }, t("filterAllBrands")),
-        h("option", { value: "Unassigned" }, "Unassigned / Legacy"),
+        h("option", { value: "All" }, "All Items (Include Unassigned)"),
+        h("option", { value: "Unassigned" }, "Unassigned / Legacy Items Only"),
         brands.map(b => h("option", { key: b, value: b }, b)))
     ),
     h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6 pb-6" },
@@ -752,35 +752,24 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
         action: h("button", { onClick: () => setModal("new"), className: "pos-btn-primary", style: { background: C.roseDeep, color: "#fff" } }, h(IconPlus, { size: 14, className: "mr-1.5" }), t("addProduct"))
       }) : filtered.length === 0 ? h("p", { className: "text-sm text-center py-12 font-medium", style: { color: C.inkDim } }, `${t("noMatch")} "${query}".`)
       : h(React.Fragment, null,
-          h("div", { className: "hidden md:block rounded-2xl overflow-hidden shadow-sm border", style: { background: C.panel, borderColor: C.border } },
-            h("table", { className: "w-full text-sm" },
-              h("thead", null, h("tr", { style: { background: C.roseTint } },
-                h("th", { className: "text-left px-4 py-3" }),
-                h("th", { className: "text-left px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colProduct")),
-                h("th", { className: "text-left px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colSku")),
-                h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colQty")),
-                h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colCost")),
-                h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colPrice")),
-                h("th", { className: "text-right px-3 py-3 font-semibold text-xs tracking-wider uppercase", style: { color: C.roseDeep } }, t("colMargin")),
-                h("th", { className: "text-right px-4 py-3" }))),
-              h("tbody", null, filtered.map((p, i) => {
-                const margin = p.price > 0 ? ((p.price - p.cost) / p.price) * 100 : 0;
-                const low = p.qty > 0 && p.qty <= lowStockThreshold;
-                return h("tr", { key: p.id, className: "transition-colors", style: { borderTop: i === 0 ? "none" : `1px solid ${C.border}` } },
-                  h("td", { className: "px-4 py-3" }, h("div", { className: "w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border", style: { background: C.inputBg, borderColor: C.border } }, p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 16, color: C.inkDim }))),
-                  h("td", { className: "px-3 py-3 font-semibold", style: { color: C.ink } }, h("div", null, p.name), p.brand ? h("div", { className: "text-[11px] font-normal opacity-70" }, p.brand) : null),
-                  h("td", { className: "px-3 py-3 font-mono text-xs", style: { color: C.inkDim } }, p.sku),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums" }, p.qty === 0 ? h("span", { className: "px-2 py-0.5 rounded-full text-xs font-semibold", style: { background: C.warnTint, color: C.warn } }, t("out")) : low ? h("span", { className: "font-semibold px-2 py-0.5 rounded-full text-xs", style: { background: C.warnTint, color: C.warn } }, p.qty) : h("span", { className: "font-medium", style: { color: C.ink } }, p.qty)),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums", style: { color: C.inkDim } }, moneyUSD(p.cost)),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.ink } }, moneyUSD(p.price)),
-                  h("td", { className: "px-3 py-3 text-right tabular-nums font-semibold", style: { color: C.sage } }, margin.toFixed(0) + "%"),
-                  h("td", { className: "px-4 py-3" }, h("div", { className: "flex items-center justify-end gap-1.5" },
-                    h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconMinus, { size: 12 })),
-                    h("button", { onClick: () => setAdjustTarget(p), className: "p-1.5 rounded-lg opacity-70 hover:opacity-100" }, h(IconBox, { size: 14 })),
-                    h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 12 })),
-                    h("button", { onClick: () => setModal(p), className: "p-1.5 rounded-lg opacity-70 hover:opacity-100 ml-1" }, h(IconPencil, { size: 14 })),
-                    h("button", { onClick: () => setConfirmDelete(p), className: "p-1.5 rounded-lg text-rose-500 hover:bg-rose-50/10" }, h(IconTrash, { size: 14 })))));
-              }))))
+          h("div", { className: "space-y-2.5" }, filtered.map((p) => {
+            const margin = p.price > 0 ? ((p.price - p.cost) / p.price) * 100 : 0;
+            const low = p.qty > 0 && p.qty <= lowStockThreshold;
+            return h("div", { key: p.id, className: "rounded-2xl p-3.5 shadow-sm border flex items-center justify-between gap-3", style: { background: C.panel, borderColor: C.border } },
+              h("div", { className: "flex items-center gap-3 min-w-0" },
+                h("div", { className: "w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center border shrink-0", style: { background: C.inputBg, borderColor: C.border } },
+                  p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 18, color: C.inkDim })),
+                h("div", { className: "min-w-0" },
+                  h("div", { className: "font-semibold text-xs truncate", style: { color: C.ink } }, p.name),
+                  h("div", { className: "text-[11px] font-mono opacity-70 truncate" }, p.sku + (p.brand ? " · " + p.brand : " · Unassigned")),
+                  h("div", { className: "text-xs font-bold tabular-nums mt-0.5", style: { color: C.roseDeep } }, moneyUSD(p.price) + " · Qty: " + p.qty))),
+              h("div", { className: "flex items-center gap-1.5 shrink-0" },
+                h("button", { onClick: () => onAdjustStock(p, -1, ""), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconMinus, { size: 12 })),
+                h("button", { onClick: () => setAdjustTarget(p), className: "p-2 rounded-xl border opacity-80 hover:opacity-100", style: { background: C.inputBg, borderColor: C.border } }, h(IconBox, { size: 14 })),
+                h("button", { onClick: () => onAdjustStock(p, 1, ""), className: "pos-stepper", style: { background: C.inputBg, borderColor: C.border, color: C.roseDeep } }, h(IconPlus, { size: 12 })),
+                h("button", { onClick: () => setModal(p), className: "p-2 rounded-xl border opacity-80 hover:opacity-100 ml-1", style: { background: C.inputBg, borderColor: C.border } }, h(IconPencil, { size: 14 })),
+                h("button", { onClick: () => setConfirmDelete(p), className: "p-2 rounded-xl text-rose-500 border bg-rose-500/10 border-rose-500/20" }, h(IconTrash, { size: 14 }))));
+          }))
         )),
     modal ? h(ProductModal, { initial: modal === "new" ? null : modal, onClose: () => setModal(null), onSave: (p) => { modal === "new" ? onAdd(p) : onEdit(p); setModal(null); } }) : null,
     adjustTarget ? h(StockAdjustModal, { product: adjustTarget, onClose: () => setAdjustTarget(null), onApply: (delta, reason) => { onAdjustStock(adjustTarget, delta, reason); setAdjustTarget(null); } }) : null,
@@ -847,7 +836,7 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   const [cartOpen, setCartOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [quickAdd, setQuickAdd] = useState(false);
-  const [brandFilter, setBrandFilter] = useState("");
+  const [brandFilter, setBrandFilter] = useState("All");
   const [flashId, setFlashId] = useState(null);
   const [cartPulse, setCartPulse] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -856,7 +845,7 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   const brands = useMemo(() => Array.from(new Set(products.map(p => (p.brand || "").trim()).filter(Boolean))).sort(), [products]);
   const filtered = products.filter(p => {
     const matchesQuery = p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase());
-    if (brandFilter === "") return matchesQuery;
+    if (brandFilter === "All") return matchesQuery;
     if (brandFilter === "Unassigned") return matchesQuery && !p.brand;
     return matchesQuery && (p.brand || "") === brandFilter;
   });
@@ -910,12 +899,12 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
 
         h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
           h("button", {
-            onClick: () => { setBrandFilter(""); triggerHaptic(6); playPOSSound("add"); },
+            onClick: () => { setBrandFilter("All"); triggerHaptic(6); playPOSSound("add"); },
             className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
             style: {
-              background: brandFilter === "" ? C.roseDeep : C.inputBg,
-              borderColor: brandFilter === "" ? C.roseDeep : C.border,
-              color: brandFilter === "" ? "#fff" : C.inkDim
+              background: brandFilter === "All" ? C.roseDeep : C.inputBg,
+              borderColor: brandFilter === "All" ? C.roseDeep : C.border,
+              color: brandFilter === "All" ? "#fff" : C.inkDim
             }
           }, t("filterAllBrands")),
           h("button", {
@@ -965,7 +954,7 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
       h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6", style: { paddingBottom: cart.length > 0 ? "5.5rem" : "1.5rem" } },
         products.length === 0 ? h(EmptyState, { icon: IconCart, title: t("nothingToSellTitle"), body: t("nothingToSellBody") })
         : h("div", { className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4" },
-            filtered.map((p, idx) => {
+            filtered.map((p) => {
               const inCart = (cart.find(c => c.id === p.id) || {}).qty || 0;
               return h("div", { key: p.id, className: "pos-card-anim" },
                 h("button", {
@@ -1236,7 +1225,7 @@ function StockLogModal({ stockLog, onClose }) {
   );
 }
 
-function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, onImport, onClose }) {
+function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, onImport, onAssignDefaultBrand, onClose }) {
   const t = useT();
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
@@ -1300,6 +1289,17 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
             h("div", { className: "flex items-center gap-2 mt-1" },
               h("input", { type: "number", min: "1000", step: "50", className: "pos-input flex-1 text-xs font-semibold tabular-nums", style: inputStyle, value: exchangeRate, onChange: (e) => setExchangeRate(e.target.value), onBlur: commitSettings }),
               h("button", { onClick: commitSettings, className: "pos-btn-ghost text-xs border", style: { borderColor: C.border, color: C.ink } }, t("saveChanges"))))),
+
+        h("div", { className: "p-4 rounded-2xl border", style: { background: C.panel, borderColor: C.border } },
+          h("div", { className: "text-xs font-bold uppercase tracking-wider mb-2", style: { color: C.ink } }, "Quick Brand Fix"),
+          h("p", { className: "text-xs mb-3", style: { color: C.inkDim } }, "Assign a default brand (e.g. 'Makara') to all items missing a brand so they appear in filters."),
+          h("button", {
+            onClick: () => {
+              const brandName = prompt("Enter brand name for unassigned items:", "Makara");
+              if (brandName) { onAssignDefaultBrand(brandName.trim()); onClose(); }
+            },
+            className: "pos-btn-primary w-full py-2.5 text-xs", style: { background: C.roseDeep, color: "#fff" }
+          }, "Assign Default Brand to All Unassigned Items")),
 
         h("div", { className: "p-4 rounded-2xl border", style: { background: C.roseTint, borderColor: C.border } },
           h("div", { className: "text-xs font-bold tracking-wider uppercase mb-2", style: { color: C.ink } }, t("paymentQr")),
@@ -1408,6 +1408,12 @@ function App() {
   const addProduct = (p) => { const next = [...products, p]; persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); };
   const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); };
   const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); persist(next, sales, settings, stockLog); setCart(c => c.filter(x => x.id !== id)); };
+
+  const assignDefaultBrandToAll = (brandName) => {
+    const nextProducts = products.map(p => (!p.brand ? { ...p, brand: brandName } : p));
+    persist(nextProducts, sales, settings, stockLog);
+    showToast(`Assigned brand "${brandName}" to unassigned items`);
+  };
 
   const adjustStock = (product, delta, reason) => {
     if (!delta) return;
@@ -1542,7 +1548,7 @@ function App() {
       page === "reports" ? h(ReportsPage, { sales, products, exchangeRate: settings.exchangeRate || 4100 }) : null,
       page === "salesHistory" ? h(SalesHistoryPage, { sales, exchangeRate: settings.exchangeRate || 4100, onVoid: voidSale, onViewReceipt: setViewSale }) : null),
     
-    settingsOpen ? h(SettingsSheet, { products, sales, settings, onSaveSettings: saveSettings, stockLog, onImport: (d) => { setProducts(d.products); setSales(d.sales); }, onClose: () => setSettingsOpen(false) }) : null,
+    settingsOpen ? h(SettingsSheet, { products, sales, settings, onSaveSettings: saveSettings, stockLog, onImport: (d) => { setProducts(d.products); setSales(d.sales); }, onAssignDefaultBrand: assignDefaultBrandToAll, onClose: () => setSettingsOpen(false) }) : null,
     lastSale ? h(ReceiptModal, { sale: lastSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setLastSale(null) }) : null,
     viewSale ? h(ReceiptModal, { sale: viewSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setViewSale(null) }) : null,
     h(Toast, { message: toast })
