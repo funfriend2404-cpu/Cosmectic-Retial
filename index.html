@@ -33,6 +33,9 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { border-radius: 99px; }
 
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
   .pos-input {
     border-radius: 12px;
     padding: 8px 12px;
@@ -103,6 +106,12 @@
   @keyframes pos-toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
   @keyframes pos-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
   @keyframes pos-flash { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+  
+  @keyframes pos-pulse-amber {
+    0% { box-shadow: 0 0 0 0 rgba(224, 109, 68, 0.5); border-color: #E06D44; }
+    70% { box-shadow: 0 0 0 6px rgba(224, 109, 68, 0); border-color: #E06D44; }
+    100% { box-shadow: 0 0 0 0 rgba(224, 109, 68, 0); border-color: #E06D44; }
+  }
 
   .pos-page-anim { animation: pos-fade-in 0.22s ease; }
   .pos-overlay-anim { animation: pos-fade-in 0.18s ease; }
@@ -111,6 +120,7 @@
   .pos-toast-anim { animation: pos-toast-in 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
   .pos-cart-pulse { animation: pos-pulse 0.28s ease; }
   .pos-row-flash { animation: pos-flash 0.6s ease; }
+  .pos-low-stock-pulse { animation: pos-pulse-amber 2s infinite; }
 
   @media print {
     body * { visibility: hidden; }
@@ -143,18 +153,61 @@ if ('serviceWorker' in navigator) {
 const playPOSSound = (type) => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
 
     if (type === "add") {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
       osc.frequency.setValueAtTime(587.33, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
       gain.gain.setValueAtTime(0.12, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
       osc.start(); osc.stop(ctx.currentTime + 0.08);
+
+    } else if (type === "cashDrawer") {
+      const notes = [1046.50, 1318.51, 1567.98, 2093.00];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.05);
+        gain.gain.setValueAtTime(0.14, ctx.currentTime + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.05 + 0.25);
+        osc.start(ctx.currentTime + idx * 0.05);
+        osc.stop(ctx.currentTime + idx * 0.05 + 0.25);
+      });
+
+    } else if (type === "remove") {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(400, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.start(); osc.stop(ctx.currentTime + 0.1);
+
+    } else if (type === "switchTab") {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(280, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.start(); osc.stop(ctx.currentTime + 0.05);
+
+    } else if (type === "warning") {
+      [0, 0.08].forEach(delay => {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(delay === 0 ? 440 : 880, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.07);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.07);
+      });
+
     } else if (type === "success") {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
       osc.type = "sine";
       osc.frequency.setValueAtTime(523.25, ctx.currentTime);
       osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
@@ -162,7 +215,10 @@ const playPOSSound = (type) => {
       gain.gain.setValueAtTime(0.16, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
       osc.start(); osc.stop(ctx.currentTime + 0.35);
+
     } else if (type === "error") {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
       osc.type = "triangle";
       osc.frequency.setValueAtTime(220, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.15);
@@ -311,10 +367,14 @@ const IconSparkles = (p) => h(SvgIcon, { d: "m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 1
 const IconCash = (p) => h(SvgIcon, { d: "M2 6h20v12H2zm4 3h.01M18 15h.01M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", ...p });
 const IconSun = (p) => h(SvgIcon, { d: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z", ...p });
 const IconMoon = (p) => h(SvgIcon, { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z", ...p });
+const IconStar = (p) => h(SvgIcon, { d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", ...p });
+const IconShare = (p) => h(SvgIcon, { d: "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13", ...p });
+const IconGrid = (p) => h(SvgIcon, { d: "M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z", ...p });
+const IconList = (p) => h(SvgIcon, { d: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01", ...p });
 
 const STRINGS = {
   en: {
-    navSales: "Sales", navInventory: "Inventory", navReports: "Reports", navSalesHistory: "Sales History", settings: "Settings",
+    navSales: "Sales Desk", navInventory: "Inventory", navReports: "Reports", navSalesHistory: "Sales History", settings: "Settings",
     fieldBrand: "Brand", brandPlaceholder: "e.g. Dior, MAC, Chanel", filterAllBrands: "All Brands",
     fieldType: "Category", typePlaceholder: "e.g. Skincare, Lips",
     stockCost: "Stock Cost", totalStockValue: "Stock Retail Value",
@@ -357,6 +417,9 @@ const STRINGS = {
     exportExcel: "Export Excel", importExcel: "Import Excel", importSuccessLabel: "Import Complete",
     exchangeRateLabel: "USD/KHR Rate ($1 = ៛)", payMethod: "Payment Method", cash: "Cash", khqr: "KHQR", card: "Credit Card",
     amountTendered: "Amount Tendered", changeDue: "Change Due", confirmPayment: "Confirm Payment", shortcutHint: "F2: Search | Esc: Close | Enter: Complete",
+    reg1: "Register 1", reg2: "Register 2", reg3: "Register 3", quickPickBar: "Quick Pick / Favorites", markFavorite: "Mark as Quick Pick",
+    phoneOptional: "Customer Phone / Contact (Optional)", sendWhatsapp: "Send WhatsApp Receipt", sendTelegram: "Send Telegram Receipt",
+    lowStockBadge: "Low Stock"
   },
   km: {
     navSales: "លក់", navInventory: "ស្តុកទំនិញ", navReports: "របាយការណ៍", navSalesHistory: "ប្រវត្តិលក់", settings: "ការកំណត់",
@@ -402,6 +465,9 @@ const STRINGS = {
     exportExcel: "នាំចេញ Excel", importExcel: "នាំចូល Excel", importSuccessLabel: "នាំចូលជោគជ័យ",
     exchangeRateLabel: "អត្រាប្តូរប្រាក់ ($1 = ៛)", payMethod: "វិធីទូទាត់", cash: "សាច់ប្រាក់", khqr: "KHQR", card: "កាតធនាគារ",
     amountTendered: "ប្រាក់ទទួលបាន", changeDue: "ប្រាក់អាប់", confirmPayment: "អះអាងទូទាត់", shortcutHint: "F2: ស្វែងរក | Esc: បិទ | Enter: គិតលុយ",
+    reg1: "កុងទ័រ ១", reg2: "កុងទ័រ ២", reg3: "កុងទ័រ ៣", quickPickBar: "ទំនិញលក់ញឹកញាប់", markFavorite: "កំណត់ជាទំនិញលក់ញឹកញាប់",
+    phoneOptional: "លេខទូរស័ព្ទអតិថិជន (មិនចាំបាច់)", sendWhatsapp: "ផ្ញើបង្កាន់ដៃតាម WhatsApp", sendTelegram: "ផ្ញើបង្កាន់ដៃតាម Telegram",
+    lowStockBadge: "ស្តុកទាប"
   }
 };
 
@@ -524,7 +590,7 @@ function PaymentModal({ totalUSD, exchangeRate, onClose, onConfirm }) {
   const changeUSD = Math.max(0, (Number(tenderedUSD) || 0) - totalUSD);
 
   const submit = () => {
-    triggerHaptic(20); playPOSSound("success"); triggerCheckoutConfetti();
+    triggerHaptic(20); playPOSSound("cashDrawer"); triggerCheckoutConfetti();
     onConfirm({ paymentMethod: payMethod, tenderedUSD: Number(tenderedUSD) || totalUSD, changeUSD });
   };
 
@@ -583,6 +649,7 @@ function ProductModal({ initial, onClose, onSave }) {
   const [cost, setCost] = useState(initial ? initial.cost : "");
   const [price, setPrice] = useState(initial ? initial.price : "");
   const [photo, setPhoto] = useState(initial ? initial.photo || "" : "");
+  const [isFavorite, setIsFavorite] = useState(initial ? !!initial.isFavorite : false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
 
@@ -601,7 +668,7 @@ function ProductModal({ initial, onClose, onSave }) {
     onSave({
       id: initial ? initial.id : uid(), name: name.trim(),
       sku: sku.trim() || "SKU-" + uid().slice(-6).toUpperCase(), brand: brand.trim(), type: type.trim(),
-      qty: clampQty(qty), cost: Number(cost) || 0, price: Number(price) || 0, photo,
+      qty: clampQty(qty), cost: Number(cost) || 0, price: Number(price) || 0, photo, isFavorite
     });
   };
 
@@ -627,6 +694,9 @@ function ProductModal({ initial, onClose, onSave }) {
         h(Field, { label: t("fieldSku") }, h("input", { className: "pos-input w-full", style: inputStyle, value: sku, onChange: (e) => setSku(e.target.value), placeholder: t("skuPlaceholder") })),
         h(Field, { label: t("fieldBrand") }, h("input", { className: "pos-input w-full", style: inputStyle, value: brand, onChange: (e) => setBrand(e.target.value), placeholder: t("brandPlaceholder") })),
         h(Field, { label: t("fieldType") }, h("input", { className: "pos-input w-full", style: inputStyle, value: type, onChange: (e) => setType(e.target.value), placeholder: t("typePlaceholder") })),
+        h("div", { className: "flex items-center gap-2 p-3 rounded-xl border", style: { background: C.inputBg, borderColor: C.border } },
+          h("input", { type: "checkbox", id: "fav-check", checked: isFavorite, onChange: (e) => setIsFavorite(e.target.checked), className: "w-4 h-4 rounded accent-rose-500 cursor-pointer" }),
+          h("label", { htmlFor: "fav-check", className: "text-xs font-semibold flex items-center gap-1.5 cursor-pointer", style: { color: C.ink } }, h(IconStar, { size: 14, color: isFavorite ? "#FFD700" : C.inkDim }), t("markFavorite"))),
         h("div", { className: "grid grid-cols-3 gap-3" },
           h(Field, { label: t("fieldQty") }, h("input", { type: "number", min: "0", step: "1", className: "pos-input w-full", style: inputStyle, value: qty, onChange: (e) => setQty(e.target.value) })),
           h(Field, { label: t("fieldCost") }, h("input", { type: "number", min: "0", step: "0.01", className: "pos-input w-full", style: inputStyle, value: cost, onChange: (e) => setCost(e.target.value), placeholder: "0.00" })),
@@ -682,7 +752,7 @@ function StockAdjustModal({ product, onClose, onApply }) {
   );
 }
 
-function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdjustStock, lowStockThreshold, onImportProducts }) {
+function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdjustStock, lowStockThreshold, onImportProducts, onToggleFavorite }) {
   const t = useT();
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
@@ -753,14 +823,22 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
       }) : filtered.length === 0 ? h("p", { className: "text-sm text-center py-12 font-medium", style: { color: C.inkDim } }, `${t("noMatch")} "${query}".`)
       : h(React.Fragment, null,
           h("div", { className: "space-y-2.5" }, filtered.map((p) => {
-            const margin = p.price > 0 ? ((p.price - p.cost) / p.price) * 100 : 0;
             const low = p.qty > 0 && p.qty <= lowStockThreshold;
-            return h("div", { key: p.id, className: "rounded-2xl p-3.5 shadow-sm border flex items-center justify-between gap-3", style: { background: C.panel, borderColor: C.border } },
+            return h("div", {
+              key: p.id,
+              className: "rounded-2xl p-3.5 shadow-sm border flex items-center justify-between gap-3" + (low ? " pos-low-stock-pulse" : ""),
+              style: { background: C.panel, borderColor: low ? C.warn : C.border }
+            },
               h("div", { className: "flex items-center gap-3 min-w-0" },
+                h("button", { onClick: () => onToggleFavorite(p.id), className: "p-1.5 rounded-lg border shrink-0 transition hover:scale-105", style: { background: C.inputBg, borderColor: C.border } },
+                  h(IconStar, { size: 16, color: p.isFavorite ? "#FFD700" : C.inkDim })),
                 h("div", { className: "w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center border shrink-0", style: { background: C.inputBg, borderColor: C.border } },
                   p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 18, color: C.inkDim })),
                 h("div", { className: "min-w-0" },
-                  h("div", { className: "font-semibold text-xs truncate", style: { color: C.ink } }, p.name),
+                  h("div", { className: "font-semibold text-xs truncate flex items-center gap-1.5", style: { color: C.ink } },
+                    p.name,
+                    low ? h("span", { className: "px-1.5 py-0.2 rounded text-[9px] font-bold uppercase", style: { background: C.warnTint, color: C.warn } }, t("lowStockBadge")) : null
+                  ),
                   h("div", { className: "text-[11px] font-mono opacity-70 truncate" }, p.sku + (p.brand ? " · " + p.brand : " · Unassigned")),
                   h("div", { className: "text-xs font-bold tabular-nums mt-0.5", style: { color: C.roseDeep } }, moneyUSD(p.price) + " · Qty: " + p.qty))),
               h("div", { className: "flex items-center gap-1.5 shrink-0" },
@@ -795,7 +873,10 @@ function CartContents({ cart, changeQty, removeItem, discountType, setDiscountTy
     h("div", { className: "flex-1 overflow-y-auto" },
       cart.length === 0 ? h(EmptyState, { icon: IconCart, title: t("cartEmpty"), body: "" })
       : h("div", { className: "space-y-2.5 pr-1" }, cart.map(item => h("div", { key: item.id, className: "flex items-center gap-2 rounded-xl p-2 transition-colors" + (flashId === item.id ? " pos-row-flash" : "") },
-          h("button", { onClick: () => removeItem(item.id), className: "w-6 shrink-0 flex items-center justify-center opacity-60 hover:text-rose-500" }, h(IconTrash, { size: 14 })),
+          h("button", {
+            onClick: () => { removeItem(item.id); playPOSSound("remove"); },
+            className: "w-6 shrink-0 flex items-center justify-center opacity-60 hover:text-rose-500"
+          }, h(IconTrash, { size: 14 })),
           h("div", { className: "flex-1 min-w-0" },
             h("div", { className: "text-xs font-semibold truncate", style: { color: C.ink } }, item.name),
             h("div", { className: "text-[11px] tabular-nums", style: { color: C.inkDim } }, `${moneyUSD(item.price)} ${t("each")}`)),
@@ -821,18 +902,63 @@ function CartContents({ cart, changeQty, removeItem, discountType, setDiscountTy
             h("div", { className: "text-lg font-black", style: { color: C.roseDeep } }, h(AnimatedNumber, { value: total, formatter: moneyUSD })),
             h("div", { className: "text-xs font-semibold", style: { color: C.sage } }, h(AnimatedNumber, { value: total, formatter: moneyKHR, rate: exchangeRate }))))),
       h("div", { className: "flex gap-2 pt-1" },
-        h("button", { onClick: () => cart.forEach(i => removeItem(i.id)), disabled: cart.length === 0, className: "pos-btn-ghost shrink-0 border", style: { borderColor: C.border, color: C.inkDim, opacity: cart.length === 0 ? 0.4 : 1 } }, t("clear")),
+        h("button", { onClick: () => { cart.forEach(i => removeItem(i.id)); playPOSSound("remove"); }, disabled: cart.length === 0, className: "pos-btn-ghost shrink-0 border", style: { borderColor: C.border, color: C.inkDim, opacity: cart.length === 0 ? 0.4 : 1 } }, t("clear")),
         h("button", { onClick: onOpenCheckout, disabled: cart.length === 0, className: "pos-btn-primary flex-1 py-3 text-sm flex items-center justify-center gap-2 shadow-lg", style: { background: C.roseDeep, color: "#fff", opacity: cart.length === 0 ? 0.4 : 1 } }, h("span", null, t("completeSale")), h(IconChevron, { size: 16 }))))
   );
 }
 
-function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddProduct }) {
+function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAddProduct }) {
   const t = useT();
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
+  
+  // Register Tabs State (3 registers)
+  const [activeReg, setActiveReg] = useState(0);
+  const [registers, setRegisters] = useState([
+    { cart: [], discountType: "percent", discountValue: 0 },
+    { cart: [], discountType: "percent", discountValue: 0 },
+    { cart: [], discountType: "percent", discountValue: 0 }
+  ]);
+  const [viewMode, setViewMode] = useState("grid"); // "grid" | "list"
+
+  const currentCart = registers[activeReg].cart;
+  const currentDiscountType = registers[activeReg].discountType;
+  const currentDiscountValue = registers[activeReg].discountValue;
+
+  const updateCart = (fn) => {
+    setRegisters(prev => {
+      const copy = [...prev];
+      const updatedCart = fn(copy[activeReg].cart);
+      copy[activeReg] = { ...copy[activeReg], cart: updatedCart };
+      return copy;
+    });
+  };
+
+  const setDiscountType = (val) => {
+    setRegisters(prev => {
+      const copy = [...prev];
+      copy[activeReg] = { ...copy[activeReg], discountType: val };
+      return copy;
+    });
+  };
+
+  const setDiscountValue = (val) => {
+    setRegisters(prev => {
+      const copy = [...prev];
+      copy[activeReg] = { ...copy[activeReg], discountValue: val };
+      return copy;
+    });
+  };
+
+  const clearCurrentCart = () => {
+    setRegisters(prev => {
+      const copy = [...prev];
+      copy[activeReg] = { ...copy[activeReg], cart: [], discountValue: 0 };
+      return copy;
+    });
+  };
+
   const [query, setQuery] = useState("");
-  const [discountType, setDiscountType] = useState("percent");
-  const [discountValue, setDiscountValue] = useState(0);
   const [cartOpen, setCartOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [quickAdd, setQuickAdd] = useState(false);
@@ -842,7 +968,9 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
   const [searchExpanded, setSearchExpanded] = useState(false);
   const searchInputRef = useRef(null);
 
+  const favorites = useMemo(() => products.filter(p => p.isFavorite), [products]);
   const brands = useMemo(() => Array.from(new Set(products.map(p => (p.brand || "").trim()).filter(Boolean))).sort(), [products]);
+  
   const filtered = products.filter(p => {
     const matchesQuery = p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase());
     if (brandFilter === "All") return matchesQuery;
@@ -855,8 +983,14 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
 
   const addToCart = (p) => {
     if (p.qty <= 0) { triggerHaptic(30); playPOSSound("error"); return; }
-    triggerHaptic(10); playPOSSound("add");
-    setCart(prev => {
+    triggerHaptic(10);
+    if (p.qty <= lowStockThreshold) {
+      playPOSSound("warning");
+    } else {
+      playPOSSound("add");
+    }
+
+    updateCart(prev => {
       const existing = prev.find(c => c.id === p.id);
       if (existing) { if (existing.qty >= p.qty) return prev; return prev.map(c => c.id === p.id ? { ...c, qty: c.qty + 1 } : c); }
       return [...prev, { id: p.id, name: p.name, price: p.price, cost: p.cost, qty: 1, stock: p.qty }];
@@ -864,39 +998,83 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
     pulseCart(); flashItem(p.id);
   };
 
-  const changeQty = (id, delta) => {
-    triggerHaptic(8); playPOSSound("add");
-    setCart(prev => prev.map(c => c.id === id ? { ...c, qty: clampQty(Math.min(c.qty + delta, c.stock)) } : c).filter(c => c.qty > 0));
+  const switchRegister = (idx) => {
+    setActiveReg(idx);
+    triggerHaptic(8);
+    playPOSSound("switchTab");
   };
-  const removeItem = (id) => setCart(prev => prev.filter(c => c.id !== id));
 
-  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const discountAmount = discountType === "percent" ? subtotal * (Math.min(Number(discountValue) || 0, 100) / 100) : Math.min(Number(discountValue) || 0, subtotal);
+  const changeQty = (id, delta) => {
+    triggerHaptic(8);
+    if (delta < 0) playPOSSound("remove"); else playPOSSound("add");
+    updateCart(prev => prev.map(c => c.id === id ? { ...c, qty: clampQty(Math.min(c.qty + delta, c.stock)) } : c).filter(c => c.qty > 0));
+  };
+  const removeItem = (id) => {
+    playPOSSound("remove");
+    updateCart(prev => prev.filter(c => c.id !== id));
+  };
+
+  const subtotal = currentCart.reduce((s, i) => s + i.price * i.qty, 0);
+  const discountAmount = currentDiscountType === "percent" ? subtotal * (Math.min(Number(currentDiscountValue) || 0, 100) / 100) : Math.min(Number(currentDiscountValue) || 0, subtotal);
   const total = Math.max(subtotal - discountAmount, 0);
-  const itemCount = cart.reduce((s, i) => s + i.qty, 0);
+  const itemCount = currentCart.reduce((s, i) => s + i.qty, 0);
 
   const finalizeSale = (paymentDetails) => {
-    onCheckout({ cart, subtotal, discountAmount, total, paymentDetails });
-    setCart([]); setDiscountValue(0); setCartOpen(false); setPaymentModalOpen(false);
+    onCheckout({ cart: currentCart, subtotal, discountAmount, total, paymentDetails });
+    clearCurrentCart(); setCartOpen(false); setPaymentModalOpen(false);
   };
 
-  const cartProps = { cart, changeQty, removeItem, discountType, setDiscountType, discountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout: () => setPaymentModalOpen(true), flashId };
+  const cartProps = { cart: currentCart, changeQty, removeItem, discountType: currentDiscountType, setDiscountType, discountValue: currentDiscountValue, setDiscountValue, subtotal, discountAmount, total, exchangeRate, onOpenCheckout: () => setPaymentModalOpen(true), flashId };
   const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
 
   useEffect(() => {
-    if (searchExpanded && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
+    if (searchExpanded && searchInputRef.current) searchInputRef.current.focus();
   }, [searchExpanded]);
 
   return h("div", { className: "flex flex-col md:flex-row h-full pos-page-anim max-w-7xl mx-auto w-full" },
     h("div", { className: "flex-1 flex flex-col min-w-0" },
-      h("div", { className: "px-4 sm:px-6 pt-5 pb-3 space-y-3" },
+      h("div", { className: "px-4 sm:px-6 pt-4 pb-3 space-y-3" },
         
-        h("div", { className: "hidden md:flex items-center justify-between" },
-          h("h1", { className: "text-xl font-bold tracking-tight", style: { color: C.ink } }, t("salesTitle")),
-          h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border", style: { borderColor: C.border, color: C.ink } }, h(IconPlus, { size: 14, color: C.roseDeep }), t("addNewItem"))),
+        // Register Tabs + Actions
+        h("div", { className: "flex items-center justify-between gap-2" },
+          h("div", { className: "flex items-center gap-1.5 p-1 rounded-xl border shadow-xs", style: { background: C.panel, borderColor: C.border } },
+            [0, 1, 2].map(idx => {
+              const count = registers[idx].cart.reduce((s, i) => s + i.qty, 0);
+              const active = activeReg === idx;
+              return h("button", {
+                key: idx, onClick: () => switchRegister(idx),
+                className: "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5",
+                style: { background: active ? C.roseDeep : "transparent", color: active ? "#fff" : C.inkDim }
+              }, `${t("reg" + (idx + 1))}`, count > 0 ? h("span", { className: "px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 text-white" }, count) : null);
+            })),
 
+          h("div", { className: "flex items-center gap-2" },
+            h("div", { className: "flex rounded-xl p-0.5 border shrink-0", style: { background: C.panel, borderColor: C.border } },
+              h("button", {
+                onClick: () => setViewMode("grid"),
+                className: "p-1.5 rounded-lg transition",
+                style: { background: viewMode === "grid" ? C.roseTint : "transparent", color: viewMode === "grid" ? C.roseDeep : C.inkDim }
+              }, h(IconGrid, { size: 15 })),
+              h("button", {
+                onClick: () => setViewMode("list"),
+                className: "p-1.5 rounded-lg transition",
+                style: { background: viewMode === "list" ? C.roseTint : "transparent", color: viewMode === "list" ? C.roseDeep : C.inkDim }
+              }, h(IconList, { size: 15 }))),
+
+            h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border", style: { borderColor: C.border, color: C.ink } }, h(IconPlus, { size: 14, color: C.roseDeep }), h("span", { className: "hidden xs:inline" }, t("addNewItem"))))),
+
+        // Favorites / Quick Pick Row
+        favorites.length > 0 ? h("div", { className: "space-y-1" },
+          h("div", { className: "text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 opacity-70", style: { color: C.roseDeep } }, h(IconStar, { size: 12, color: "#FFD700" }), t("quickPickBar")),
+          h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
+            favorites.map(p => h("button", {
+              key: p.id, onClick: () => addToCart(p),
+              className: "px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 border flex items-center gap-2 transition hover:scale-105 shadow-sm",
+              style: { background: C.roseTint, borderColor: C.border, color: C.ink }
+            }, p.name, h("span", { className: "font-bold text-rose-400" }, moneyUSD(p.price)))))
+        ) : null,
+
+        // Brand Pills
         h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
           h("button", {
             onClick: () => { setBrandFilter("All"); triggerHaptic(6); playPOSSound("add"); },
@@ -928,6 +1106,7 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
           }, b))
         ),
 
+        // Search Bar
         h("div", { className: "flex items-center justify-between gap-2" },
           h("div", { className: "relative flex items-center transition-all duration-300", style: { width: searchExpanded ? "100%" : "42px", maxWidth: searchExpanded ? "380px" : "42px" } },
             searchExpanded ? h(React.Fragment, null,
@@ -951,17 +1130,20 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
         )
       ),
 
-      h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6", style: { paddingBottom: cart.length > 0 ? "5.5rem" : "1.5rem" } },
+      // Product Grid / List Display
+      h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6", style: { paddingBottom: currentCart.length > 0 ? "5.5rem" : "1.5rem" } },
         products.length === 0 ? h(EmptyState, { icon: IconCart, title: t("nothingToSellTitle"), body: t("nothingToSellBody") })
-        : h("div", { className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4" },
+        : viewMode === "grid"
+        ? h("div", { className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4" },
             filtered.map((p) => {
-              const inCart = (cart.find(c => c.id === p.id) || {}).qty || 0;
+              const inCart = (currentCart.find(c => c.id === p.id) || {}).qty || 0;
+              const low = p.qty > 0 && p.qty <= lowStockThreshold;
               return h("div", { key: p.id, className: "pos-card-anim" },
                 h("button", {
                   onClick: () => addToCart(p),
                   disabled: p.qty <= 0,
-                  className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between relative overflow-hidden border",
-                  style: { background: C.panel, borderColor: C.border, opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
+                  className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between relative overflow-hidden border" + (low ? " pos-low-stock-pulse" : ""),
+                  style: { background: C.panel, borderColor: low ? C.warn : C.border, opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
                 },
                   h("div", { className: "w-full aspect-square rounded-xl overflow-hidden mb-2.5 flex items-center justify-center relative border", style: { background: C.inputBg, borderColor: C.border } },
                     p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 22, color: C.inkDim }),
@@ -969,13 +1151,46 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
                       className: "absolute top-2 right-2 min-w-[22px] h-5 px-1.5 rounded-full flex items-center justify-center text-xs font-bold shadow-md" + (cartPulse ? " pos-cart-pulse" : ""),
                       style: { background: C.roseDeep, color: "#fff" }
                     }, inCart) : null,
-                    p.qty <= 0 ? h("span", { className: "absolute inset-x-0 bottom-0 text-center text-[10px] py-1 font-bold uppercase tracking-wider backdrop-blur-sm", style: { background: "rgba(200,90,50,0.85)", color: "#fff" } }, t("outOfStock")) : null),
+                    p.qty <= 0
+                      ? h("span", { className: "absolute inset-x-0 bottom-0 text-center text-[10px] py-1 font-bold uppercase tracking-wider backdrop-blur-sm", style: { background: "rgba(200,90,50,0.85)", color: "#fff" } }, t("outOfStock"))
+                      : low
+                      ? h("span", { className: "absolute top-2 left-2 text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase shadow-sm", style: { background: C.warn, color: "#fff" } }, t("lowStockBadge"))
+                      : null),
                   h("div", { className: "text-xs font-semibold leading-snug line-clamp-2 mb-0.5", style: { color: C.ink } }, p.name),
                   p.brand ? h("div", { className: "text-[10px] font-medium opacity-70 mb-1" }, p.brand) : null,
                   h("div", { className: "mt-auto" },
                     h("div", { className: "text-sm font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(p.price)),
                     h("div", { className: "text-[10px] font-semibold tabular-nums opacity-80", style: { color: C.sage } }, moneyKHR(p.price, exchangeRate)))));
             }))
+        : h("div", { className: "space-y-2 pb-4" },
+            filtered.map(p => {
+              const inCart = (currentCart.find(c => c.id === p.id) || {}).qty || 0;
+              const low = p.qty > 0 && p.qty <= lowStockThreshold;
+              return h("div", {
+                key: p.id, onClick: () => addToCart(p),
+                className: "flex items-center justify-between p-2.5 rounded-xl border shadow-xs cursor-pointer transition hover:scale-[0.99]" + (low ? " pos-low-stock-pulse" : ""),
+                style: { background: C.panel, borderColor: low ? C.warn : C.border, opacity: p.qty <= 0 ? 0.6 : 1 }
+              },
+                h("div", { className: "flex items-center gap-3 min-w-0" },
+                  h("div", { className: "w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center border shrink-0", style: { background: C.inputBg, borderColor: C.border } },
+                    p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 16, color: C.inkDim })),
+                  h("div", { className: "min-w-0" },
+                    h("div", { className: "text-xs font-semibold truncate flex items-center gap-1.5", style: { color: C.ink } },
+                      p.name,
+                      low ? h("span", { className: "px-1.5 py-0.2 rounded text-[9px] font-bold uppercase", style: { background: C.warnTint, color: C.warn } }, t("lowStockBadge")) : null
+                    ),
+                    h("div", { className: "text-[10px] opacity-70 truncate font-mono" }, (p.brand ? p.brand + " · " : "") + p.sku))),
+                h("div", { className: "flex items-center gap-3 shrink-0" },
+                  h("div", { className: "text-right" },
+                    h("div", { className: "text-xs font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(p.price)),
+                    h("div", { className: "text-[10px] font-medium opacity-70" }, `Stock: ${p.qty}`)),
+                  h("button", {
+                    disabled: p.qty <= 0,
+                    className: "px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs border transition",
+                    style: { background: inCart > 0 ? C.roseDeep : C.roseTint, color: inCart > 0 ? "#fff" : C.roseDeep, borderColor: C.border }
+                  }, inCart > 0 ? `+${inCart}` : t("completeSale").slice(0, 3))))
+            })
+          )
       )),
 
     h("div", { className: "hidden md:flex md:w-80 lg:w-96 flex-col shrink-0 my-5 mr-6 rounded-2xl shadow-sm overflow-hidden border", style: { background: C.panel, borderColor: C.border } },
@@ -985,7 +1200,7 @@ function SalesPage({ products, cart, setCart, exchangeRate, onCheckout, onAddPro
       h("div", { className: "flex-1 flex flex-col px-5 py-4 min-h-0" }, h(CartContents, cartProps))
     ),
 
-    (cart.length > 0 && !cartOpen) ? h("button", {
+    (currentCart.length > 0 && !cartOpen) ? h("button", {
       onClick: () => setCartOpen(true),
       className: "md:hidden fixed left-4 right-4 z-30 rounded-2xl px-5 py-3.5 flex items-center justify-between shadow-2xl" + (cartPulse ? " pos-cart-pulse" : ""),
       style: { bottom: "calc(1rem + env(safe-area-inset-bottom))", background: C.roseDeep, color: "#fff" }
@@ -1165,15 +1380,54 @@ function ReceiptModal({ sale, qrCode, exchangeRate, onClose }) {
   const t = useT();
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
+  const [customerPhone, setCustomerPhone] = useState("");
+
   const fmtDate = (ts) => new Date(ts).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
   const receiptId = "#" + sale.id.slice(-8).toUpperCase();
   const doPrint = () => window.print();
+
+  const textReceipt = `🌸 *MAKARA COSMETICS RECEIPT*
+Receipt: ${receiptId}
+Date: ${fmtDate(sale.timestamp)}
+--------------------------------
+${sale.items.map(i => `${i.name} x${i.qty} - ${moneyUSD(i.price * i.qty)}`).join('\n')}
+--------------------------------
+Subtotal: ${moneyUSD(sale.subtotal)}
+Discount: -${moneyUSD(sale.discountAmount)}
+*TOTAL: ${moneyUSD(sale.total)} (${moneyKHR(sale.total, exchangeRate)})*
+Payment: ${sale.paymentDetails ? sale.paymentDetails.paymentMethod.toUpperCase() : 'CASH'}
+Thank you for shopping with us!`;
+
+  const sendWhatsapp = () => {
+    const clean = customerPhone.replace(/[^0-9]/g, '');
+    const url = clean ? `https://wa.me/${clean}?text=${encodeURIComponent(textReceipt)}` : `https://wa.me/?text=${encodeURIComponent(textReceipt)}`;
+    window.open(url, '_blank');
+  };
+
+  const sendTelegram = () => {
+    const url = `https://t.me/share/url?url=&text=${encodeURIComponent(textReceipt)}`;
+    window.open(url, '_blank');
+  };
+
+  const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
 
   return h(SheetShell, { onClose, maxWidth: "max-w-sm" },
     h("div", { className: "shrink-0 flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
       h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("receiptTitle")),
       h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
-    h("div", { className: "flex-1 px-6 py-5 overflow-y-auto" },
+    h("div", { className: "flex-1 px-6 py-5 overflow-y-auto space-y-4" },
+      
+      // Phone Number Input for Digital Receipt
+      h("div", { className: "space-y-2" },
+        h(Field, { label: t("phoneOptional") },
+          h("input", { type: "tel", placeholder: "e.g. +85512345678", value: customerPhone, onChange: (e) => setCustomerPhone(e.target.value), className: "pos-input w-full text-xs font-semibold", style: inputStyle })),
+        h("div", { className: "grid grid-cols-2 gap-2" },
+          h("button", { onClick: sendWhatsapp, className: "pos-btn-ghost text-xs font-bold border flex items-center justify-center gap-1.5 py-2", style: { borderColor: "#25D366", color: "#25D366" } }, h(IconShare, { size: 14 }), "WhatsApp"),
+          h("button", { onClick: sendTelegram, className: "pos-btn-ghost text-xs font-bold border flex items-center justify-center gap-1.5 py-2", style: { borderColor: "#229ED9", color: "#229ED9" } }, h(IconShare, { size: 14 }), "Telegram")
+        )
+      ),
+
+      // Paper Receipt Preview
       h("div", {
         id: "receipt-print-area",
         className: "p-4 rounded-xl shadow-inner border border-gray-100",
@@ -1196,7 +1450,8 @@ function ReceiptModal({ sale, qrCode, exchangeRate, onClose }) {
         qrCode ? h("div", { style: { textAlign: "center", marginTop: 12 } },
           h("img", { src: qrCode, style: { width: 110, height: 110, objectFit: "contain", margin: "0 auto" } }),
           h("div", { style: { marginTop: 4, fontSize: 10 } }, "Scan KHQR to Pay")) : null
-      )),
+      )
+    ),
     h("div", { className: "shrink-0 flex items-center justify-end gap-2 px-6 py-4", style: { borderTop: `1px solid ${C.border}`, paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" } },
       h("button", { onClick: onClose, className: "pos-btn-ghost", style: { color: C.inkDim } }, t("closeReceipt")),
       h("button", { onClick: doPrint, className: "pos-btn-primary flex items-center gap-1.5", style: { background: C.roseDeep, color: "#fff" } }, h(IconPrint, { size: 14 }), t("printReceipt")))
@@ -1340,7 +1595,6 @@ function App() {
   const [sales, setSales] = useState([]);
   const [settings, setSettings] = useState({ exchangeRate: 4100, lowStockThreshold: 5, qrCode: "", theme: "dark" });
   const [stockLog, setStockLog] = useState([]);
-  const [cart, setCart] = useState([]);
   const [page, setPage] = useState("sales");
   const [toast, setToast] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1378,12 +1632,11 @@ function App() {
         if (settingsOpen) setSettingsOpen(false);
         else if (lastSale) setLastSale(null);
         else if (viewSale) setViewSale(null);
-        else if (cart.length > 0) { setCart([]); playPOSSound("error"); }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [settingsOpen, lastSale, viewSale, cart]);
+  }, [settingsOpen, lastSale, viewSale]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -1407,7 +1660,12 @@ function App() {
 
   const addProduct = (p) => { const next = [...products, p]; persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); };
   const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); };
-  const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); persist(next, sales, settings, stockLog); setCart(c => c.filter(x => x.id !== id)); };
+  const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); persist(next, sales, settings, stockLog); };
+
+  const toggleFavorite = (id) => {
+    const nextProducts = products.map(p => p.id === id ? { ...p, isFavorite: !p.isFavorite } : p);
+    persist(nextProducts, sales, settings, stockLog);
+  };
 
   const assignDefaultBrandToAll = (brandName) => {
     const nextProducts = products.map(p => (!p.brand ? { ...p, brand: brandName } : p));
@@ -1443,7 +1701,7 @@ function App() {
         nextProducts[idx] = { ...nextProducts[idx], name, brand, type, qty: clampQty(qty), cost, price };
         updated++;
       } else {
-        nextProducts.push({ id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), brand, type, qty: clampQty(qty), cost, price, photo: "" });
+        nextProducts.push({ id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), brand, type, qty: clampQty(qty), cost, price, photo: "", isFavorite: false });
         added++;
       }
     }
@@ -1543,8 +1801,8 @@ function App() {
     h("div", { className: "w-full text-center py-1 text-[11px] font-mono opacity-60 hidden md:block border-b", style: { borderColor: C.border, background: C.panel } }, t("shortcutHint")),
 
     h("main", { className: "flex-1 min-w-0" },
-      page === "inventory" ? h(InventoryPage, { products, exchangeRate: settings.exchangeRate || 4100, onAdd: addProduct, onEdit: editProduct, onDelete: deleteProduct, onAdjustStock: adjustStock, lowStockThreshold: settings.lowStockThreshold, onImportProducts: importProducts }) : null,
-      page === "sales" ? h(SalesPage, { products, cart, setCart, exchangeRate: settings.exchangeRate || 4100, onCheckout: handleCheckout, onAddProduct: addProduct }) : null,
+      page === "inventory" ? h(InventoryPage, { products, exchangeRate: settings.exchangeRate || 4100, onAdd: addProduct, onEdit: editProduct, onDelete: deleteProduct, onAdjustStock: adjustStock, lowStockThreshold: settings.lowStockThreshold || 5, onImportProducts: importProducts, onToggleFavorite: toggleFavorite }) : null,
+      page === "sales" ? h(SalesPage, { products, exchangeRate: settings.exchangeRate || 4100, lowStockThreshold: settings.lowStockThreshold || 5, onCheckout: handleCheckout, onAddProduct: addProduct }) : null,
       page === "reports" ? h(ReportsPage, { sales, products, exchangeRate: settings.exchangeRate || 4100 }) : null,
       page === "salesHistory" ? h(SalesHistoryPage, { sales, exchangeRate: settings.exchangeRate || 4100, onVoid: voidSale, onViewReceipt: setViewSale }) : null),
     
