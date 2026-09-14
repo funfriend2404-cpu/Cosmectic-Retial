@@ -7,11 +7,12 @@
 <meta name="theme-color" content="#120E10" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>">
 
-<link rel="manifest" href='data:application/manifest+json,{"name":"Makara Cosmetic POS","short_name":"MakaraPOS","start_url":".","display":"standalone","background_color":"#120E10","theme_color":"#120E10","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Makara Cosmetics POS","short_name":"MakaraPOS","start_url":".","display":"standalone","background_color":"#120E10","theme_color":"#120E10","icons":[{"src":"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌸</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}'>
 
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -371,6 +372,9 @@ const IconStar = (p) => h(SvgIcon, { d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.
 const IconShare = (p) => h(SvgIcon, { d: "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13", ...p });
 const IconGrid = (p) => h(SvgIcon, { d: "M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z", ...p });
 const IconList = (p) => h(SvgIcon, { d: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01", ...p });
+const IconCloud = (p) => h(SvgIcon, { d: "M17.5 19H9a7 7 0 1 1 6.71-9h.79a4.5 4.5 0 1 1 0 9z", ...p });
+const IconCloudOff = (p) => h(SvgIcon, { d: "M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3M1 1l22 22", ...p });
+const IconRefresh = (p) => h(SvgIcon, { d: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15", ...p });
 
 const STRINGS = {
   en: {
@@ -419,7 +423,11 @@ const STRINGS = {
     amountTendered: "Amount Tendered", changeDue: "Change Due", confirmPayment: "Confirm Payment", shortcutHint: "F2: Search | Esc: Close | Enter: Complete",
     reg1: "Register 1", reg2: "Register 2", reg3: "Register 3", quickPickBar: "Quick Pick / Favorites", markFavorite: "Mark as Quick Pick",
     phoneOptional: "Customer Phone / Contact (Optional)", sendWhatsapp: "Send WhatsApp Receipt", sendTelegram: "Send Telegram Receipt",
-    lowStockBadge: "Low Stock"
+    lowStockBadge: "Low Stock",
+    cloudSyncTitle: "Cloud Sync (Supabase)", cloudSyncHint: "Connect once per device. All registers on the same project stay in sync.",
+    supabaseUrl: "Supabase Project URL", supabaseKey: "Supabase Anon Key", storeId: "Store ID",
+    storeIdHint: "Devices sharing this ID share the same live data.", connectCloud: "Connect", disconnectCloud: "Disconnect",
+    resyncNow: "Force Resync Now", cloudConnected: "Cloud sync connected", cloudDisconnected: "Cloud sync disconnected",
   },
   km: {
     navSales: "លក់", navInventory: "ស្តុកទំនិញ", navReports: "របាយការណ៍", navSalesHistory: "ប្រវត្តិលក់", settings: "ការកំណត់",
@@ -467,7 +475,11 @@ const STRINGS = {
     amountTendered: "ប្រាក់ទទួលបាន", changeDue: "ប្រាក់អាប់", confirmPayment: "អះអាងទូទាត់", shortcutHint: "F2: ស្វែងរក | Esc: បិទ | Enter: គិតលុយ",
     reg1: "កុងទ័រ ១", reg2: "កុងទ័រ ២", reg3: "កុងទ័រ ៣", quickPickBar: "ទំនិញលក់ញឹកញាប់", markFavorite: "កំណត់ជាទំនិញលក់ញឹកញាប់",
     phoneOptional: "លេខទូរស័ព្ទអតិថិជន (មិនចាំបាច់)", sendWhatsapp: "ផ្ញើបង្កាន់ដៃតាម WhatsApp", sendTelegram: "ផ្ញើបង្កាន់ដៃតាម Telegram",
-    lowStockBadge: "ស្តុកទាប"
+    lowStockBadge: "ស្តុកទាប",
+    cloudSyncTitle: "ការធ្វើសមកាលកម្ម Cloud (Supabase)", cloudSyncHint: "ភ្ជាប់ម្តងក្នុងមួយឧបករណ៍។",
+    supabaseUrl: "Supabase Project URL", supabaseKey: "Supabase Anon Key", storeId: "លេខសម្គាល់ហាង",
+    storeIdHint: "ឧបករណ៍ដែលប្រើលេខដូចគ្នានឹងឃើញទិន្នន័យដូចគ្នា។", connectCloud: "ភ្ជាប់", disconnectCloud: "ផ្តាច់",
+    resyncNow: "Sync ឡើងវិញឥឡូវនេះ", cloudConnected: "បានភ្ជាប់ Cloud Sync", cloudDisconnected: "បានផ្តាច់ Cloud Sync",
   }
 };
 
@@ -1480,7 +1492,7 @@ function StockLogModal({ stockLog, onClose }) {
   );
 }
 
-function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, onImport, onAssignDefaultBrand, onClose }) {
+function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, onImport, onAssignDefaultBrand, onClose, cloudConfig, onSaveCloudConfig, onForceResync, syncStatus }) {
   const t = useT();
   const theme = React.useContext(ThemeContext);
   const C = THEMES[theme];
@@ -1490,6 +1502,9 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
   const [threshold, setThreshold] = useState(settings.lowStockThreshold);
   const [exchangeRate, setExchangeRate] = useState(settings.exchangeRate || 4100);
   const [logOpen, setLogOpen] = useState(false);
+  const [supaUrl, setSupaUrl] = useState(cloudConfig.url || "");
+  const [supaKey, setSupaKey] = useState(cloudConfig.key || "");
+  const [storeId, setStoreId] = useState(cloudConfig.storeId || "default-store");
 
   const exportData = () => {
     const blob = new Blob([JSON.stringify({ products, sales, settings, stockLog, exportedAt: new Date().toISOString() }, null, 2)], { type: "application/json" });
@@ -1532,12 +1547,40 @@ function SettingsSheet({ products, sales, settings, onSaveSettings, stockLog, on
   };
 
   const inputStyle = { background: C.inputBg, color: C.ink, border: `1px solid ${C.border}` };
+  const statusColor = syncStatus === "online" ? C.sage : syncStatus === "syncing" ? C.warn : C.inkDim;
+  const statusLabel = syncStatus === "online" ? t("statusOnline") : syncStatus === "syncing" ? t("statusSyncing") : t("statusOffline");
 
   return h(SheetShell, { onClose },
       h("div", { className: "flex items-center justify-between px-6 py-4", style: { borderBottom: `1px solid ${C.border}` } },
         h("h2", { className: "font-semibold text-base", style: { color: C.ink } }, t("settings")),
         h("button", { onClick: onClose, className: "p-2 -mr-2 opacity-60 hover:opacity-100" }, h(IconX, { size: 18 }))),
       h("div", { className: "px-6 py-5 space-y-5 flex-1 overflow-y-auto" },
+
+        h("div", { className: "p-4 rounded-2xl border", style: { background: C.roseTint, borderColor: C.border } },
+          h("div", { className: "flex items-center justify-between mb-2" },
+            h("div", { className: "text-xs font-bold uppercase tracking-wider flex items-center gap-1.5", style: { color: C.ink } }, h(IconCloud, { size: 14, color: C.roseDeep }), t("cloudSyncTitle")),
+            h("span", { className: "text-[10px] font-bold px-2 py-0.5 rounded-full", style: { background: C.panel, color: statusColor } }, statusLabel)),
+          h("p", { className: "text-[11px] mb-3", style: { color: C.inkDim } }, t("cloudSyncHint")),
+          h("div", { className: "space-y-2.5" },
+            h(Field, { label: t("supabaseUrl") },
+              h("input", { className: "pos-input w-full text-xs", style: inputStyle, value: supaUrl, onChange: (e) => setSupaUrl(e.target.value), placeholder: "https://xxxx.supabase.co" })),
+            h(Field, { label: t("supabaseKey") },
+              h("input", { type: "password", className: "pos-input w-full text-xs", style: inputStyle, value: supaKey, onChange: (e) => setSupaKey(e.target.value), placeholder: "eyJhbGci..." })),
+            h(Field, { label: t("storeId") },
+              h("input", { className: "pos-input w-full text-xs", style: inputStyle, value: storeId, onChange: (e) => setStoreId(e.target.value), placeholder: "default-store" })),
+            h("p", { className: "text-[11px]", style: { color: C.inkDim } }, t("storeIdHint")),
+            h("div", { className: "flex gap-2 pt-1" },
+              h("button", {
+                onClick: () => onSaveCloudConfig({ url: supaUrl.trim(), key: supaKey.trim(), storeId: storeId.trim() || "default-store" }),
+                className: "pos-btn-primary flex-1 text-xs py-2.5", style: { background: C.roseDeep, color: "#fff" }
+              }, t("connectCloud")),
+              cloudConfig.url ? h("button", {
+                onClick: () => onSaveCloudConfig({ url: "", key: "", storeId: storeId.trim() || "default-store" }),
+                className: "pos-btn-ghost text-xs border", style: { borderColor: C.border, color: C.warn }
+              }, t("disconnectCloud")) : null),
+            cloudConfig.url ? h("button", {
+              onClick: onForceResync, className: "text-xs font-semibold underline flex items-center gap-1.5 mt-1", style: { color: C.roseDeep }
+            }, h(IconRefresh, { size: 12 }), t("resyncNow")) : null)),
 
         h("div", { className: "p-4 rounded-2xl border", style: { background: C.panel, borderColor: C.border } },
           h(Field, { label: t("exchangeRateLabel") },
@@ -1602,6 +1645,10 @@ function App() {
   const [now, setNow] = useState(() => Date.now());
   const [lastSale, setLastSale] = useState(null);
   const [viewSale, setViewSale] = useState(null);
+  const [cloudConfig, setCloudConfig] = useState({ url: "", key: "", storeId: "default-store" });
+  const [syncStatus, setSyncStatus] = useState("offline");
+  const supabaseRef = useRef(null);
+  const channelsRef = useRef([]);
 
   const t = (key) => (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
   const currentTheme = settings.theme || "dark";
@@ -1615,7 +1662,8 @@ function App() {
       const s = await getDBItem("sales", "main", []);
       const set = await getDBItem("settings", "main", { exchangeRate: 4100, lowStockThreshold: 5, qrCode: "", theme: "dark" });
       const log = await getDBItem("stockLog", "main", []);
-      if (active) { setProducts(p); setSales(s); setSettings(set); setStockLog(log); }
+      const cloud = await getDBItem("settings", "cloudConfig", { url: "", key: "", storeId: "default-store" });
+      if (active) { setProducts(p); setSales(s); setSettings(set); setStockLog(log); setCloudConfig(cloud); }
     })();
     return () => { active = false; };
   }, []);
@@ -1643,6 +1691,199 @@ function App() {
     return () => clearInterval(id);
   }, []);
 
+  // ---- Supabase cloud sync wiring ----
+  useEffect(() => {
+    channelsRef.current.forEach(ch => { try { supabaseRef.current && supabaseRef.current.removeChannel(ch); } catch (e) {} });
+    channelsRef.current = [];
+    supabaseRef.current = null;
+
+    if (!cloudConfig.url || !cloudConfig.key || !window.supabase) {
+      setSyncStatus("offline");
+      return;
+    }
+
+    const client = window.supabase.createClient(cloudConfig.url, cloudConfig.key);
+    supabaseRef.current = client;
+    const storeId = cloudConfig.storeId || "default-store";
+
+    (async () => {
+      setSyncStatus("syncing");
+      try {
+        const [{ data: remoteProducts, error: e1 }, { data: remoteSales, error: e2 }, { data: remoteSettings, error: e3 }, { data: remoteLog, error: e4 }] = await Promise.all([
+          client.from("pos_products").select("*").eq("store_id", storeId),
+          client.from("pos_sales").select("*").eq("store_id", storeId),
+          client.from("pos_settings").select("*").eq("store_id", storeId).maybeSingle(),
+          client.from("pos_stock_log").select("*").eq("store_id", storeId).order("timestamp", { ascending: false }).limit(500),
+        ]);
+        if (e1 || e2 || e3 || e4) throw (e1 || e2 || e3 || e4);
+
+        const mappedProducts = (remoteProducts || []).map(rowToProduct);
+        const mappedSales = (remoteSales || []).map(rowToSale);
+        const mappedLog = (remoteLog || []).map(rowToStockLog);
+
+        setProducts(mappedProducts);
+        setSales(mappedSales);
+        setStockLog(mappedLog);
+        await setDBItem("products", "main", mappedProducts);
+        await setDBItem("sales", "main", mappedSales);
+        await setDBItem("stockLog", "main", mappedLog);
+
+        if (remoteSettings) {
+          const merged = { ...settings, exchangeRate: remoteSettings.exchange_rate, lowStockThreshold: remoteSettings.low_stock_threshold, qrCode: remoteSettings.qr_code || "" };
+          setSettings(merged);
+          await setDBItem("settings", "main", merged);
+        } else {
+          await client.from("pos_settings").upsert({ store_id: storeId, exchange_rate: settings.exchangeRate, low_stock_threshold: settings.lowStockThreshold, qr_code: settings.qrCode || "" });
+        }
+
+        setSyncStatus("online");
+      } catch (err) {
+        console.error("Supabase initial sync failed:", err);
+        setSyncStatus("offline");
+      }
+    })();
+
+    const productsChannel = client.channel(`pos_products_${storeId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pos_products", filter: `store_id=eq.${storeId}` }, (payload) => {
+        setProducts(prev => {
+          let next;
+          if (payload.eventType === "DELETE") next = prev.filter(p => p.id !== payload.old.id);
+          else {
+            const mapped = rowToProduct(payload.new);
+            const exists = prev.some(p => p.id === mapped.id);
+            next = exists ? prev.map(p => p.id === mapped.id ? mapped : p) : [...prev, mapped];
+          }
+          setDBItem("products", "main", next);
+          return next;
+        });
+      }).subscribe();
+
+    const salesChannel = client.channel(`pos_sales_${storeId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pos_sales", filter: `store_id=eq.${storeId}` }, (payload) => {
+        setSales(prev => {
+          let next;
+          if (payload.eventType === "DELETE") next = prev.filter(s => s.id !== payload.old.id);
+          else {
+            const mapped = rowToSale(payload.new);
+            const exists = prev.some(s => s.id === mapped.id);
+            next = exists ? prev.map(s => s.id === mapped.id ? mapped : s) : [...prev, mapped];
+          }
+          setDBItem("sales", "main", next);
+          return next;
+        });
+      }).subscribe();
+
+    const settingsChannel = client.channel(`pos_settings_${storeId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pos_settings", filter: `store_id=eq.${storeId}` }, (payload) => {
+        if (payload.eventType === "DELETE") return;
+        setSettings(prev => {
+          const next = { ...prev, exchangeRate: payload.new.exchange_rate, lowStockThreshold: payload.new.low_stock_threshold, qrCode: payload.new.qr_code || "" };
+          setDBItem("settings", "main", next);
+          return next;
+        });
+      }).subscribe();
+
+    const stockLogChannel = client.channel(`pos_stock_log_${storeId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "pos_stock_log", filter: `store_id=eq.${storeId}` }, (payload) => {
+        setStockLog(prev => {
+          if (prev.some(l => l.id === payload.new.id)) return prev;
+          const next = [...prev, rowToStockLog(payload.new)];
+          setDBItem("stockLog", "main", next);
+          return next;
+        });
+      }).subscribe();
+
+    channelsRef.current = [productsChannel, salesChannel, settingsChannel, stockLogChannel];
+
+    return () => {
+      channelsRef.current.forEach(ch => { try { client.removeChannel(ch); } catch (e) {} });
+      channelsRef.current = [];
+    };
+  }, [cloudConfig.url, cloudConfig.key, cloudConfig.storeId]);
+
+  function rowToProduct(row) {
+    return { id: row.id, name: row.name, sku: row.sku, brand: row.brand || "", type: row.type || "", qty: row.qty, cost: row.cost, price: row.price, photo: row.photo || "", isFavorite: !!row.is_favorite };
+  }
+  function rowToSale(row) {
+    return { id: row.id, timestamp: Number(row.timestamp), items: row.items || [], subtotal: row.subtotal, discountAmount: row.discount_amount, total: row.total, paymentDetails: row.payment_details || null, voided: !!row.voided };
+  }
+  function rowToStockLog(row) {
+    return { id: row.id, timestamp: Number(row.timestamp), productId: row.product_id, productName: row.product_name, delta: row.delta, reason: row.reason || "" };
+  }
+  function productToRow(p, storeId) {
+    return { id: p.id, store_id: storeId, name: p.name, sku: p.sku, brand: p.brand || "", type: p.type || "", qty: p.qty, cost: p.cost, price: p.price, photo: p.photo || "", is_favorite: !!p.isFavorite };
+  }
+  function saleToRow(s, storeId) {
+    return { id: s.id, store_id: storeId, timestamp: s.timestamp, items: s.items, subtotal: s.subtotal, discount_amount: s.discountAmount, total: s.total, payment_details: s.paymentDetails || null, voided: !!s.voided };
+  }
+  function stockLogToRow(l, storeId) {
+    return { id: l.id, store_id: storeId, timestamp: l.timestamp, product_id: l.productId, product_name: l.productName, delta: l.delta, reason: l.reason || "" };
+  }
+
+  const pushProducts = async (list) => {
+    const client = supabaseRef.current;
+    if (!client || !list.length) return;
+    try { setSyncStatus("syncing"); await client.from("pos_products").upsert(list.map(p => productToRow(p, cloudConfig.storeId))); setSyncStatus("online"); }
+    catch (err) { console.error("Cloud push (products) failed:", err); setSyncStatus("offline"); }
+  };
+  const pushDeleteProduct = async (id) => {
+    const client = supabaseRef.current;
+    if (!client) return;
+    try { await client.from("pos_products").delete().eq("id", id).eq("store_id", cloudConfig.storeId); }
+    catch (err) { console.error("Cloud delete (product) failed:", err); }
+  };
+  const pushSale = async (sale) => {
+    const client = supabaseRef.current;
+    if (!client) return;
+    try { setSyncStatus("syncing"); await client.from("pos_sales").upsert([saleToRow(sale, cloudConfig.storeId)]); setSyncStatus("online"); }
+    catch (err) { console.error("Cloud push (sale) failed:", err); setSyncStatus("offline"); }
+  };
+  const pushStockLog = async (entry) => {
+    const client = supabaseRef.current;
+    if (!client) return;
+    try { await client.from("pos_stock_log").insert([stockLogToRow(entry, cloudConfig.storeId)]); }
+    catch (err) { console.error("Cloud push (stock log) failed:", err); }
+  };
+  const pushSettings = async (nextSettings) => {
+    const client = supabaseRef.current;
+    if (!client) return;
+    try {
+      setSyncStatus("syncing");
+      await client.from("pos_settings").upsert({ store_id: cloudConfig.storeId, exchange_rate: nextSettings.exchangeRate, low_stock_threshold: nextSettings.lowStockThreshold, qr_code: nextSettings.qrCode || "" });
+      setSyncStatus("online");
+    } catch (err) { console.error("Cloud push (settings) failed:", err); setSyncStatus("offline"); }
+  };
+
+  const forceResync = async () => {
+    setCloudConfig(c => ({ ...c })); // no-op state touch just to show intent; real refetch happens via effect re-trigger below
+    setSyncStatus("syncing");
+    const client = supabaseRef.current;
+    if (!client) { setSyncStatus("offline"); return; }
+    try {
+      const storeId = cloudConfig.storeId || "default-store";
+      const [{ data: remoteProducts }, { data: remoteSales }, { data: remoteLog }] = await Promise.all([
+        client.from("pos_products").select("*").eq("store_id", storeId),
+        client.from("pos_sales").select("*").eq("store_id", storeId),
+        client.from("pos_stock_log").select("*").eq("store_id", storeId).order("timestamp", { ascending: false }).limit(500),
+      ]);
+      const mappedProducts = (remoteProducts || []).map(rowToProduct);
+      const mappedSales = (remoteSales || []).map(rowToSale);
+      const mappedLog = (remoteLog || []).map(rowToStockLog);
+      setProducts(mappedProducts); setSales(mappedSales); setStockLog(mappedLog);
+      await setDBItem("products", "main", mappedProducts);
+      await setDBItem("sales", "main", mappedSales);
+      await setDBItem("stockLog", "main", mappedLog);
+      setSyncStatus("online");
+      showToast(t("cloudConnected"));
+    } catch (err) { console.error("Force resync failed:", err); setSyncStatus("offline"); }
+  };
+
+  const saveCloudConfig = async (next) => {
+    setCloudConfig(next);
+    await setDBItem("settings", "cloudConfig", next);
+    showToast(next.url ? t("cloudConnected") : t("cloudDisconnected"));
+  };
+
   const persist = async (nextProducts, nextSales, nextSettings, nextStockLog) => {
     setProducts(nextProducts); setSales(nextSales); setSettings(nextSettings); setStockLog(nextStockLog);
     await setDBItem("products", "main", nextProducts);
@@ -1658,19 +1899,23 @@ function App() {
     persist(products, sales, { ...settings, theme: nextTheme }, stockLog);
   };
 
-  const addProduct = (p) => { const next = [...products, p]; persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); };
-  const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); };
-  const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); persist(next, sales, settings, stockLog); };
+  const addProduct = (p) => { const next = [...products, p]; persist(next, sales, settings, stockLog); showToast(t("toastProductAdded")); pushProducts([p]); };
+  const editProduct = (p) => { const next = products.map(x => x.id === p.id ? p : x); persist(next, sales, settings, stockLog); showToast(t("toastProductUpdated")); pushProducts([p]); };
+  const deleteProduct = (id) => { const next = products.filter(x => x.id !== id); persist(next, sales, settings, stockLog); pushDeleteProduct(id); };
 
   const toggleFavorite = (id) => {
     const nextProducts = products.map(p => p.id === id ? { ...p, isFavorite: !p.isFavorite } : p);
     persist(nextProducts, sales, settings, stockLog);
+    const changed = nextProducts.find(p => p.id === id);
+    if (changed) pushProducts([changed]);
   };
 
   const assignDefaultBrandToAll = (brandName) => {
-    const nextProducts = products.map(p => (!p.brand ? { ...p, brand: brandName } : p));
+    const changed = [];
+    const nextProducts = products.map(p => { if (!p.brand) { const np = { ...p, brand: brandName }; changed.push(np); return np; } return p; });
     persist(nextProducts, sales, settings, stockLog);
     showToast(`Assigned brand "${brandName}" to unassigned items`);
+    pushProducts(changed);
   };
 
   const adjustStock = (product, delta, reason) => {
@@ -1680,13 +1925,17 @@ function App() {
     const nextLog = [...stockLog, entry];
     persist(nextProducts, sales, settings, nextLog);
     showToast(t("stockAdjusted"));
+    const changed = nextProducts.find(p => p.id === product.id);
+    if (changed) pushProducts([changed]);
+    pushStockLog(entry);
   };
 
-  const saveSettings = (nextSettings) => { persist(products, sales, nextSettings, stockLog); };
+  const saveSettings = (nextSettings) => { persist(products, sales, nextSettings, stockLog); pushSettings(nextSettings); };
 
   const importProducts = (rows) => {
     let updated = 0, added = 0;
     let nextProducts = [...products];
+    const changed = [];
     for (const row of rows) {
       const name = String(row.Name || row.name || "").trim();
       const qty = Number(row.Qty ?? row.qty ?? 0);
@@ -1699,14 +1948,18 @@ function App() {
       const idx = sku ? nextProducts.findIndex(p => p.sku === sku) : -1;
       if (idx >= 0) {
         nextProducts[idx] = { ...nextProducts[idx], name, brand, type, qty: clampQty(qty), cost, price };
+        changed.push(nextProducts[idx]);
         updated++;
       } else {
-        nextProducts.push({ id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), brand, type, qty: clampQty(qty), cost, price, photo: "", isFavorite: false });
+        const np = { id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), brand, type, qty: clampQty(qty), cost, price, photo: "", isFavorite: false };
+        nextProducts.push(np);
+        changed.push(np);
         added++;
       }
     }
     persist(nextProducts, sales, settings, stockLog);
     showToast(`${t("importSuccessLabel")}: ${updated} updated, ${added} added`);
+    pushProducts(changed);
   };
 
   const handleCheckout = ({ cart: items, subtotal, discountAmount, total, paymentDetails }) => {
@@ -1716,6 +1969,9 @@ function App() {
     persist(nextProducts, nextSales, settings, stockLog);
     showToast(t("toastSaleCompleted"));
     setLastSale(sale);
+    pushSale(sale);
+    const changedProducts = items.map(i => nextProducts.find(p => p.id === i.id)).filter(Boolean);
+    pushProducts(changedProducts);
   };
 
   const voidSale = (saleId) => {
@@ -1728,6 +1984,10 @@ function App() {
     const nextSales = sales.map(s => s.id === saleId ? { ...s, voided: true } : s);
     persist(nextProducts, nextSales, settings, stockLog);
     showToast(t("toastSaleVoided"));
+    const voidedSale = nextSales.find(s => s.id === saleId);
+    if (voidedSale) pushSale(voidedSale);
+    const changedProducts = sale.items.map(i => nextProducts.find(p => p.id === i.productId)).filter(Boolean);
+    pushProducts(changedProducts);
   };
 
   const NAV = [
@@ -1764,6 +2024,12 @@ function App() {
           })),
 
         h("div", { className: "flex items-center gap-2 shrink-0" },
+          h("div", {
+            className: "hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-1 rounded-full border opacity-90",
+            style: { borderColor: C.border, background: C.bg, color: syncStatus === "online" ? C.sage : syncStatus === "syncing" ? C.warn : C.inkDim },
+            title: syncStatus === "online" ? t("statusOnline") : syncStatus === "syncing" ? t("statusSyncing") : t("statusOffline")
+          }, syncStatus === "offline" ? h(IconCloudOff, { size: 12 }) : h(IconCloud, { size: 12 })),
+
           h("div", { className: "hidden sm:flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-1 rounded-full border opacity-80", style: { borderColor: C.border, background: C.bg, color: C.ink } },
             h(IconClock, { size: 12, color: C.roseDeep }), h("span", null, clockStr)),
 
@@ -1806,7 +2072,7 @@ function App() {
       page === "reports" ? h(ReportsPage, { sales, products, exchangeRate: settings.exchangeRate || 4100 }) : null,
       page === "salesHistory" ? h(SalesHistoryPage, { sales, exchangeRate: settings.exchangeRate || 4100, onVoid: voidSale, onViewReceipt: setViewSale }) : null),
     
-    settingsOpen ? h(SettingsSheet, { products, sales, settings, onSaveSettings: saveSettings, stockLog, onImport: (d) => { setProducts(d.products); setSales(d.sales); }, onAssignDefaultBrand: assignDefaultBrandToAll, onClose: () => setSettingsOpen(false) }) : null,
+    settingsOpen ? h(SettingsSheet, { products, sales, settings, onSaveSettings: saveSettings, stockLog, onImport: (d) => { setProducts(d.products); setSales(d.sales); }, onAssignDefaultBrand: assignDefaultBrandToAll, onClose: () => setSettingsOpen(false), cloudConfig, onSaveCloudConfig: saveCloudConfig, onForceResync: forceResync, syncStatus }) : null,
     lastSale ? h(ReceiptModal, { sale: lastSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setLastSale(null) }) : null,
     viewSale ? h(ReceiptModal, { sale: viewSale, qrCode: settings.qrCode, exchangeRate: settings.exchangeRate || 4100, onClose: () => setViewSale(null) }) : null,
     h(Toast, { message: toast })
