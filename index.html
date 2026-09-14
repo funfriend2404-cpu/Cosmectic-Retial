@@ -784,7 +784,7 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
   });
 
   const exportExcel = () => {
-    const rows = products.map(p => ({ Name: p.name, SKU: p.sku, Brand: p.brand || "", Type: p.type || "", Qty: p.qty, Cost: p.cost, Price: p.price }));
+    const rows = products.map(p => ({ Name: p.name, SKU: p.sku, Brand: p.brand || "", Type: p.type || "", Qty: p.qty, Cost: p.cost, Price: p.price, Photo: p.photo || "" }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Products");
@@ -799,7 +799,8 @@ function InventoryPage({ products, exchangeRate, onAdd, onEdit, onDelete, onAdju
       try {
         const wb = XLSX.read(evt.target.result, { type: "binary" });
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
+        // Read raw headerless rows or headered rows seamlessly
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
         onImportProducts(rows);
       } catch (err) { alert("Unable to read Excel file."); }
     };
@@ -1855,7 +1856,7 @@ function App() {
   };
 
   const forceResync = async () => {
-    setCloudConfig(c => ({ ...c })); // no-op state touch just to show intent; real refetch happens via effect re-trigger below
+    setCloudConfig(c => ({ ...c }));
     setSyncStatus("syncing");
     const client = supabaseRef.current;
     if (!client) { setSyncStatus("offline"); return; }
@@ -1932,31 +1933,90 @@ function App() {
 
   const saveSettings = (nextSettings) => { persist(products, sales, nextSettings, stockLog); pushSettings(nextSettings); };
 
+  // INTEGRATED HEADERLESS & HEADERED EXCEL IMPORT LOGIC
   const importProducts = (rows) => {
+    if (!rows || rows.length === 0) return;
+
     let updated = 0, added = 0;
     let nextProducts = [...products];
     const changed = [];
-    for (const row of rows) {
-      const name = String(row.Name || row.name || "").trim();
-      const qty = Number(row.Qty ?? row.qty ?? 0);
-      const cost = Number(row.Cost ?? row.cost ?? 0);
-      const price = Number(row.Price ?? row.price ?? 0);
+
+    // Check if first row contains string header names or raw data
+    const firstRow = rows[0];
+    const isHeaderRow = Array.isArray(firstRow) 
+      ? firstRow.some(cell => typeof cell === "string" && ["name", "product", "sku", "price", "qty", "quantity"].includes(String(cell).toLowerCase().trim()))
+      : Object.keys(firstRow).some(k => ["name", "product", "sku", "price", "qty", "quantity"].includes(String(k).toLowerCase().trim()));
+
+    const dataRows = isHeaderRow ? rows.slice(1) : rows;
+
+    for (const row of dataRows) {
+      if (!row) continue;
+
+      let name = "", sku = "", brand = "", type = "", qty = 0, cost = 0, price = 0, photo = "";
+
+      if (Array.isArray(row)) {
+        // Position-based extraction (Headerless mode)
+        name = String(row[0] || "").trim();
+        sku = String(row[1] || "").trim();
+        brand = String(row[2] || "").trim();
+        type = String(row[3] || "").trim();
+        qty = Number(row[4] || 0);
+        cost = Number(row[5] || 0);
+        price = Number(row[6] || 0);
+        photo = String(row[7] || "").trim();
+      } else {
+        // Object key extraction (Named header mode)
+        const keys = Object.keys(row);
+        const getVal = (namedKey, index) => {
+          if (row[namedKey] !== undefined) return row[namedKey];
+          return keys[index] !== undefined ? row[keys[index]] : "";
+        };
+
+        name = String(getVal("Name", 0) || getVal("name", 0)).trim();
+        sku = String(getVal("SKU", 1) || getVal("sku", 1)).trim();
+        brand = String(getVal("Brand", 2) || getVal("brand", 2)).trim();
+        type = String(getVal("Type", 3) || getVal("type", 3)).trim();
+        qty = Number(getVal("Qty", 4) || getVal("qty", 4) || 0);
+        cost = Number(getVal("Cost", 5) || getVal("cost", 5) || 0);
+        price = Number(getVal("Price", 6) || getVal("price", 6) || 0);
+        photo = String(getVal("Photo", 7) || getVal("photo", 7)).trim();
+      }
+
       if (!name || qty < 0 || cost < 0 || price < 0) continue;
-      const sku = String(row.SKU || row.sku || "").trim();
-      const brand = String(row.Brand || row.brand || "").trim();
-      const type = String(row.Type || row.type || "").trim();
+
       const idx = sku ? nextProducts.findIndex(p => p.sku === sku) : -1;
       if (idx >= 0) {
-        nextProducts[idx] = { ...nextProducts[idx], name, brand, type, qty: clampQty(qty), cost, price };
+        nextProducts[idx] = { 
+          ...nextProducts[idx], 
+          name, 
+          brand, 
+          type, 
+          qty: clampQty(qty), 
+          cost, 
+          price, 
+          photo: photo || nextProducts[idx].photo 
+        };
         changed.push(nextProducts[idx]);
         updated++;
       } else {
-        const np = { id: uid(), name, sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), brand, type, qty: clampQty(qty), cost, price, photo: "", isFavorite: false };
+        const np = { 
+          id: uid(), 
+          name, 
+          sku: sku || "SKU-" + uid().slice(-6).toUpperCase(), 
+          brand, 
+          type, 
+          qty: clampQty(qty), 
+          cost, 
+          price, 
+          photo, 
+          isFavorite: false 
+        };
         nextProducts.push(np);
         changed.push(np);
         added++;
       }
     }
+
     persist(nextProducts, sales, settings, stockLog);
     showToast(`${t("importSuccessLabel")}: ${updated} updated, ${added} added`);
     pushProducts(changed);
