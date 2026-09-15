@@ -375,12 +375,14 @@ const IconList = (p) => h(SvgIcon, { d: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.0
 const IconCloud = (p) => h(SvgIcon, { d: "M17.5 19H9a7 7 0 1 1 6.71-9h.79a4.5 4.5 0 1 1 0 9z", ...p });
 const IconCloudOff = (p) => h(SvgIcon, { d: "M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3M1 1l22 22", ...p });
 const IconRefresh = (p) => h(SvgIcon, { d: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15", ...p });
+const IconZoomIn = (p) => h(SvgIcon, { d: "M11 8v6M8 11h6M21 21l-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z", ...p });
+const IconZoomOut = (p) => h(SvgIcon, { d: "M8 11h6M21 21l-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z", ...p });
 
 const STRINGS = {
   en: {
     navSales: "Sales Desk", navInventory: "Inventory", navReports: "Reports", navSalesHistory: "Sales History", settings: "Settings",
     fieldBrand: "Brand", brandPlaceholder: "e.g. Dior, MAC, Chanel", filterAllBrands: "All Brands",
-    fieldType: "Category", typePlaceholder: "e.g. Skincare, Lips",
+    fieldType: "Category", typePlaceholder: "e.g. Skincare, Lips", filterAllTypes: "All Types",
     stockCost: "Stock Cost", totalStockValue: "Stock Retail Value",
     salesHistoryTitle: "Sales History", salesHistorySubtitle: "Completed sales transactions",
     noSalesHistoryTitle: "No sales recorded", noSalesHistoryBody: "Completed sales will appear here.",
@@ -428,11 +430,12 @@ const STRINGS = {
     supabaseUrl: "Supabase Project URL", supabaseKey: "Supabase Anon Key", storeId: "Store ID",
     storeIdHint: "Devices sharing this ID share the same live data.", connectCloud: "Connect", disconnectCloud: "Disconnect",
     resyncNow: "Force Resync Now", cloudConnected: "Cloud sync connected", cloudDisconnected: "Cloud sync disconnected",
+    enlargePhotos: "Enlarge Photos", compactGrid: "Compact Grid",
   },
   km: {
     navSales: "លក់", navInventory: "ស្តុកទំនិញ", navReports: "របាយការណ៍", navSalesHistory: "ប្រវត្តិលក់", settings: "ការកំណត់",
     fieldBrand: "យីហោ (Brand)", brandPlaceholder: "ឧ. Dior, MAC, Chanel", filterAllBrands: "គ្រប់យីហោ",
-    fieldType: "ប្រភេទ", typePlaceholder: "ឧ. ថែរក្សាស្បែក",
+    fieldType: "ប្រភេទ", typePlaceholder: "ឧ. ថែរក្សាស្បែក", filterAllTypes: "គ្រប់ប្រភេទ",
     stockCost: "ថ្លៃដើមស្តុក", totalStockValue: "តម្លៃស្តុកសរុប",
     salesHistoryTitle: "ប្រវត្តិការលក់", salesHistorySubtitle: "ការលក់ដែលបានបញ្ចប់",
     noSalesHistoryTitle: "មិនទាន់មានការលក់", noSalesHistoryBody: "ការលក់នឹងបង្ហាញនៅទីនេះ។",
@@ -480,6 +483,7 @@ const STRINGS = {
     supabaseUrl: "Supabase Project URL", supabaseKey: "Supabase Anon Key", storeId: "លេខសម្គាល់ហាង",
     storeIdHint: "ឧបករណ៍ដែលប្រើលេខដូចគ្នានឹងឃើញទិន្នន័យដូចគ្នា។", connectCloud: "ភ្ជាប់", disconnectCloud: "ផ្តាច់",
     resyncNow: "Sync ឡើងវិញឥឡូវនេះ", cloudConnected: "បានភ្ជាប់ Cloud Sync", cloudDisconnected: "បានផ្តាច់ Cloud Sync",
+    enlargePhotos: "ពង្រីករូបភាព", compactGrid: "តារាងតូច",
   }
 };
 
@@ -933,6 +937,7 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
     { cart: [], discountType: "percent", discountValue: 0 }
   ]);
   const [viewMode, setViewMode] = useState("grid"); // "grid" | "list"
+  const [gridSize, setGridSize] = useState("compact"); // "compact" | "large"
 
   const currentCart = registers[activeReg].cart;
   const currentDiscountType = registers[activeReg].discountType;
@@ -976,6 +981,7 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [quickAdd, setQuickAdd] = useState(false);
   const [brandFilter, setBrandFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
   const [flashId, setFlashId] = useState(null);
   const [cartPulse, setCartPulse] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -983,12 +989,14 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
 
   const favorites = useMemo(() => products.filter(p => p.isFavorite), [products]);
   const brands = useMemo(() => Array.from(new Set(products.map(p => (p.brand || "").trim()).filter(Boolean))).sort(), [products]);
-  
+  const types = useMemo(() => Array.from(new Set(products.map(p => (p.type || "").trim()).filter(Boolean))).sort(), [products]);
+
   const filtered = products.filter(p => {
     const matchesQuery = p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase());
-    if (brandFilter === "All") return matchesQuery;
-    if (brandFilter === "Unassigned") return matchesQuery && !p.brand;
-    return matchesQuery && (p.brand || "") === brandFilter;
+    if (!matchesQuery) return false;
+    const matchesBrand = brandFilter === "All" ? true : brandFilter === "Unassigned" ? !p.brand : (p.brand || "") === brandFilter;
+    const matchesType = typeFilter === "All" ? true : typeFilter === "Unassigned" ? !p.type : (p.type || "") === typeFilter;
+    return matchesBrand && matchesType;
   });
 
   const pulseCart = () => { setCartPulse(true); setTimeout(() => setCartPulse(false), 300); };
@@ -1044,6 +1052,33 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
     if (searchExpanded && searchInputRef.current) searchInputRef.current.focus();
   }, [searchExpanded]);
 
+  const pillRow = (label, value, options, unassignedLabel, onPick) => h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
+    h("button", {
+      onClick: () => { onPick("All"); triggerHaptic(6); playPOSSound("add"); },
+      className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
+      style: { background: value === "All" ? C.roseDeep : C.inputBg, borderColor: value === "All" ? C.roseDeep : C.border, color: value === "All" ? "#fff" : C.inkDim }
+    }, label),
+    h("button", {
+      onClick: () => { onPick("Unassigned"); triggerHaptic(6); playPOSSound("add"); },
+      className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
+      style: { background: value === "Unassigned" ? C.roseDeep : C.inputBg, borderColor: value === "Unassigned" ? C.roseDeep : C.border, color: value === "Unassigned" ? "#fff" : C.inkDim }
+    }, unassignedLabel),
+    options.map(o => h("button", {
+      key: o,
+      onClick: () => { onPick(o); triggerHaptic(6); playPOSSound("add"); },
+      className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
+      style: { background: value === o ? C.roseDeep : C.inputBg, borderColor: value === o ? C.roseDeep : C.border, color: value === o ? "#fff" : C.inkDim }
+    }, o))
+  );
+
+  const gridColsClass = gridSize === "large"
+    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4"
+    : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4";
+  const cardMinHeight = gridSize === "large" ? 260 : 180;
+  const photoIconSize = gridSize === "large" ? 32 : 22;
+  const nameFontClass = gridSize === "large" ? "text-sm" : "text-xs";
+  const priceFontClass = gridSize === "large" ? "text-base" : "text-sm";
+
   return h("div", { className: "flex flex-col md:flex-row h-full pos-page-anim max-w-7xl mx-auto w-full" },
     h("div", { className: "flex-1 flex flex-col min-w-0" },
       h("div", { className: "px-4 sm:px-6 pt-4 pb-3 space-y-3" },
@@ -1074,6 +1109,13 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
                 style: { background: viewMode === "list" ? C.roseTint : "transparent", color: viewMode === "list" ? C.roseDeep : C.inkDim }
               }, h(IconList, { size: 15 }))),
 
+            viewMode === "grid" ? h("button", {
+              onClick: () => { setGridSize(s => s === "compact" ? "large" : "compact"); triggerHaptic(8); playPOSSound("add"); },
+              className: "pos-nav-btn flex items-center justify-center w-8 h-8 rounded-xl border shrink-0 transition",
+              style: { borderColor: C.border, background: C.panel, color: C.roseDeep },
+              title: gridSize === "compact" ? t("enlargePhotos") : t("compactGrid")
+            }, gridSize === "compact" ? h(IconZoomIn, { size: 15 }) : h(IconZoomOut, { size: 15 })) : null,
+
             h("button", { onClick: () => setQuickAdd(true), className: "pos-btn-ghost text-xs font-semibold flex items-center gap-1.5 border", style: { borderColor: C.border, color: C.ink } }, h(IconPlus, { size: 14, color: C.roseDeep }), h("span", { className: "hidden xs:inline" }, t("addNewItem"))))),
 
         // Favorites / Quick Pick Row
@@ -1088,36 +1130,9 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
         ) : null,
 
         // Brand Pills
-        h("div", { className: "flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" },
-          h("button", {
-            onClick: () => { setBrandFilter("All"); triggerHaptic(6); playPOSSound("add"); },
-            className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
-            style: {
-              background: brandFilter === "All" ? C.roseDeep : C.inputBg,
-              borderColor: brandFilter === "All" ? C.roseDeep : C.border,
-              color: brandFilter === "All" ? "#fff" : C.inkDim
-            }
-          }, t("filterAllBrands")),
-          h("button", {
-            onClick: () => { setBrandFilter("Unassigned"); triggerHaptic(6); playPOSSound("add"); },
-            className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
-            style: {
-              background: brandFilter === "Unassigned" ? C.roseDeep : C.inputBg,
-              borderColor: brandFilter === "Unassigned" ? C.roseDeep : C.border,
-              color: brandFilter === "Unassigned" ? "#fff" : C.inkDim
-            }
-          }, "Unassigned"),
-          brands.map(b => h("button", {
-            key: b,
-            onClick: () => { setBrandFilter(b); triggerHaptic(6); playPOSSound("add"); },
-            className: "px-3.5 py-1.5 rounded-full text-xs font-bold shrink-0 transition border",
-            style: {
-              background: brandFilter === b ? C.roseDeep : C.inputBg,
-              borderColor: brandFilter === b ? C.roseDeep : C.border,
-              color: brandFilter === b ? "#fff" : C.inkDim
-            }
-          }, b))
-        ),
+        pillRow(t("filterAllBrands"), brandFilter, brands, "Unassigned", setBrandFilter),
+        // Type Pills
+        pillRow(t("filterAllTypes"), typeFilter, types, "Unassigned", setTypeFilter),
 
         // Search Bar
         h("div", { className: "flex items-center justify-between gap-2" },
@@ -1147,7 +1162,7 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
       h("div", { className: "flex-1 overflow-y-auto px-4 sm:px-6", style: { paddingBottom: currentCart.length > 0 ? "5.5rem" : "1.5rem" } },
         products.length === 0 ? h(EmptyState, { icon: IconCart, title: t("nothingToSellTitle"), body: t("nothingToSellBody") })
         : viewMode === "grid"
-        ? h("div", { className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 pb-4" },
+        ? h("div", { className: gridColsClass },
             filtered.map((p) => {
               const inCart = (currentCart.find(c => c.id === p.id) || {}).qty || 0;
               const low = p.qty > 0 && p.qty <= lowStockThreshold;
@@ -1156,10 +1171,10 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
                   onClick: () => addToCart(p),
                   disabled: p.qty <= 0,
                   className: "pos-product-card text-left w-full shadow-sm flex flex-col justify-between relative overflow-hidden border" + (low ? " pos-low-stock-pulse" : ""),
-                  style: { background: C.panel, borderColor: low ? C.warn : C.border, opacity: p.qty <= 0 ? 0.55 : 1, minHeight: 180 }
+                  style: { background: C.panel, borderColor: low ? C.warn : C.border, opacity: p.qty <= 0 ? 0.55 : 1, minHeight: cardMinHeight }
                 },
                   h("div", { className: "w-full aspect-square rounded-xl overflow-hidden mb-2.5 flex items-center justify-center relative border", style: { background: C.inputBg, borderColor: C.border } },
-                    p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: 22, color: C.inkDim }),
+                    p.photo ? h("img", { src: p.photo, className: "w-full h-full object-cover" }) : h(IconImage, { size: photoIconSize, color: C.inkDim }),
                     inCart > 0 ? h("span", {
                       className: "absolute top-2 right-2 min-w-[22px] h-5 px-1.5 rounded-full flex items-center justify-center text-xs font-bold shadow-md" + (cartPulse ? " pos-cart-pulse" : ""),
                       style: { background: C.roseDeep, color: "#fff" }
@@ -1169,10 +1184,10 @@ function SalesPage({ products, exchangeRate, lowStockThreshold, onCheckout, onAd
                       : low
                       ? h("span", { className: "absolute top-2 left-2 text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase shadow-sm", style: { background: C.warn, color: "#fff" } }, t("lowStockBadge"))
                       : null),
-                  h("div", { className: "text-xs font-semibold leading-snug line-clamp-2 mb-0.5", style: { color: C.ink } }, p.name),
+                  h("div", { className: nameFontClass + " font-semibold leading-snug line-clamp-2 mb-0.5", style: { color: C.ink } }, p.name),
                   p.brand ? h("div", { className: "text-[10px] font-medium opacity-70 mb-1" }, p.brand) : null,
                   h("div", { className: "mt-auto" },
-                    h("div", { className: "text-sm font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(p.price)),
+                    h("div", { className: priceFontClass + " font-bold tabular-nums", style: { color: C.roseDeep } }, moneyUSD(p.price)),
                     h("div", { className: "text-[10px] font-semibold tabular-nums opacity-80", style: { color: C.sage } }, moneyKHR(p.price, exchangeRate)))));
             }))
         : h("div", { className: "space-y-2 pb-4" },
